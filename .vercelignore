@@ -1,0 +1,24 @@
+# Large data files not needed for API
+data/
+design/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# Development files
+*.md
+.git/
+.gitignore
+tests/
+*.log
+
+# Scrapers (not needed at runtime)
+src/services/*_scraper*.py
+src/parsers/
+
+# Local config
+.env.local
