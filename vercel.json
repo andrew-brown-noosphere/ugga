@@ -6,14 +6,5 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ],
-  "functions": {
-    "api/index.py": {
-      "runtime": "@vercel/python",
-      "maxDuration": 30
-    }
-  },
-  "env": {
-    "PYTHONPATH": "."
-  }
+  ]
 }
