@@ -41,6 +41,9 @@ wheels/
 .DS_Store
 Thumbs.db
 
+# Design assets
+design/
+
 # Testing
 .coverage
 htmlcov/

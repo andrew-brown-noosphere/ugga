@@ -21,3 +21,6 @@ httpx>=0.26.0
 # AI services
 openai>=1.0.0
 anthropic>=0.18.0
+
+# Embeddings
+voyageai>=0.2.0
