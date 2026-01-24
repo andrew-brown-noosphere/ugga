@@ -1,0 +1,59 @@
+[project]
+name = "uga-course-scheduler"
+version = "0.1.0"
+description = "Smart course scheduling service for UGA students"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "UGA Course Scheduler Team"}
+]
+keywords = ["uga", "course", "scheduling", "education"]
+
+dependencies = [
+    "pdfplumber>=0.10.0",
+    "pypdf>=3.0.0",
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.13.0",
+    "pandas>=2.0.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.26.0",
+    "aiosqlite>=0.19.0",
+    "apscheduler>=3.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+uga-scheduler = "src.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
