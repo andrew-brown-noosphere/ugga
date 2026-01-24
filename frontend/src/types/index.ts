@@ -578,3 +578,70 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
 }
+
+// =============================================================================
+// Profile Sharing Types
+// =============================================================================
+
+export interface VerificationStatus {
+  uga_email: string | null
+  is_verified: boolean
+  username: string | null
+  profile_url: string | null
+  verified_at: string | null
+}
+
+export interface SendVerificationResponse {
+  success: boolean
+  message: string
+  expires_in_seconds: number
+}
+
+export interface ConfirmVerificationResponse {
+  success: boolean
+  username: string
+  profile_url: string
+  message: string
+}
+
+export interface VisibilitySettings {
+  profile_visibility: 'public' | 'verified_only' | 'cohorts_only' | 'private'
+  show_full_name: boolean
+  show_photo: boolean
+  show_bio: boolean
+  show_major: boolean
+  show_graduation_year: boolean
+  show_classification: boolean
+  show_completed_courses: boolean
+  show_current_schedule: boolean
+  show_gpa: boolean
+  show_degree_progress: boolean
+  show_email: boolean
+  show_social_links: boolean
+}
+
+export interface PublicProfile {
+  username: string
+  display_name: string | null
+  photo_url: string | null
+  bio: string | null
+  major: string | null
+  graduation_year: number | null
+  classification: string | null
+  completed_courses_count: number | null
+  degree_progress_percent: number | null
+  gpa: number | null
+  linkedin_url: string | null
+  github_url: string | null
+  twitter_url: string | null
+  website_url: string | null
+  is_verified: boolean
+  is_own_profile: boolean
+}
+
+export interface ProfileSearchResult {
+  username: string
+  display_name: string
+  photo_url: string | null
+  major: string | null
+}

@@ -17,6 +17,8 @@ import {
 } from 'lucide-react'
 import { getCurrentUser, updateUserPreferences, getPersonalizedReport, getPrograms } from '../lib/api'
 import { clsx } from 'clsx'
+import UGAVerificationCard from '../components/UGAVerificationCard'
+import VisibilitySettingsCard from '../components/VisibilitySettingsCard'
 
 const GOALS = [
   { value: 'fast-track', label: 'Fast-Track', description: 'Graduate as quickly as possible' },
@@ -489,6 +491,12 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* UGA Email Verification */}
+      <UGAVerificationCard />
+
+      {/* Profile Visibility Settings */}
+      <VisibilitySettingsCard />
 
       {/* Degree Progress */}
       {report?.degree_progress && (

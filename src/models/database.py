@@ -854,6 +854,20 @@ class User(Base):
     twitter_url: Mapped[Optional[str]] = mapped_column(String(255))
     website_url: Mapped[Optional[str]] = mapped_column(String(255))
 
+    # UGA Email Verification (required for social features)
+    uga_email: Mapped[Optional[str]] = mapped_column(String(100), unique=True, nullable=True, index=True)
+    uga_email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    uga_email_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verification_code: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
+    verification_code_expires: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Username (unlocked after UGA email verification)
+    username: Mapped[Optional[str]] = mapped_column(String(30), unique=True, nullable=True, index=True)
+
+    # Profile Sharing & Visibility (JSON)
+    # Example: {"profile_visibility": "verified_only", "show_full_name": true, "show_major": true, ...}
+    visibility_settings: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Subscription (Stripe)
     stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     subscription_status: Mapped[str] = mapped_column(String(20), default="free")  # free, active, cancelled, expired
@@ -890,8 +904,53 @@ class User(Base):
             return False
         return True
 
+    @property
+    def is_verified(self) -> bool:
+        """Check if user has verified their UGA email."""
+        return self.uga_email_verified and self.username is not None
+
+    @property
+    def profile_url(self) -> Optional[str]:
+        """Get the public profile URL if verified."""
+        if self.username:
+            return f"/u/{self.username}"
+        return None
+
+    def get_visibility_settings(self) -> dict:
+        """Get parsed visibility settings with defaults."""
+        import json
+        defaults = {
+            "profile_visibility": "verified_only",
+            "show_full_name": True,
+            "show_photo": True,
+            "show_bio": True,
+            "show_major": True,
+            "show_graduation_year": True,
+            "show_classification": True,
+            "show_completed_courses": False,
+            "show_current_schedule": False,
+            "show_gpa": False,
+            "show_degree_progress": False,
+            "show_email": False,
+            "show_social_links": True,
+        }
+        if self.visibility_settings:
+            try:
+                settings = json.loads(self.visibility_settings)
+                defaults.update(settings)
+            except json.JSONDecodeError:
+                pass
+        return defaults
+
+    def set_visibility_settings(self, settings: dict) -> None:
+        """Set visibility settings as JSON."""
+        import json
+        current = self.get_visibility_settings()
+        current.update(settings)
+        self.visibility_settings = json.dumps(current)
+
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, email='{self.email}', major='{self.major}')>"
+        return f"<User(id={self.id}, email='{self.email}', username='{self.username}')>"
 
 
 # =============================================================================

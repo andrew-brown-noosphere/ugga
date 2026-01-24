@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
               <div className="flex items-center justify-center w-9 h-9 bg-white/20 rounded-lg">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
-              <span className="text-white text-xl font-bold tracking-tight">ugga.ai</span>
+              <span className="text-white text-xl font-bold tracking-tight">UGA Planner</span>
             </Link>
 
             {/* Navigation */}
@@ -143,7 +143,7 @@ export default function Layout({ children }: LayoutProps) {
       <footer className="bg-white border-t mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-gray-500 text-sm">
-            ugga.ai - Smart Course Planning
+            UGA Planner - Smart Course Planning
           </p>
           <p className="text-center text-gray-400 text-xs mt-1">
             Not affiliated with the University of Georgia. Always consult your academic advisor.

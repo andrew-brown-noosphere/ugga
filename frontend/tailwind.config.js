@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ugga.ai brand colors
+        // Brand colors
         'brand': {
           50: '#eef2ff',
           100: '#e0e7ff',

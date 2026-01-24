@@ -373,7 +373,69 @@ export async function getQuickProgress(): Promise<QuickProgress> {
 // AI Chat endpoints
 // =============================================================================
 
-import type { ChatResponse, ChatMessage } from '../types'
+import type {
+  ChatResponse,
+  ChatMessage,
+  VerificationStatus,
+  SendVerificationResponse,
+  ConfirmVerificationResponse,
+  VisibilitySettings,
+  PublicProfile,
+  ProfileSearchResult,
+} from '../types'
+
+// =============================================================================
+// Profile & Verification endpoints
+// =============================================================================
+
+export async function getVerificationStatus(): Promise<VerificationStatus> {
+  const { data } = await api.get('/profile/verify/status')
+  return data
+}
+
+export async function sendVerificationCode(ugaEmail: string): Promise<SendVerificationResponse> {
+  const { data } = await api.post('/profile/verify/send', { uga_email: ugaEmail })
+  return data
+}
+
+export async function confirmVerification(
+  ugaEmail: string,
+  code: string,
+  username?: string
+): Promise<ConfirmVerificationResponse> {
+  const { data } = await api.post('/profile/verify/confirm', {
+    uga_email: ugaEmail,
+    code,
+    username,
+  })
+  return data
+}
+
+export async function getVisibilitySettings(): Promise<VisibilitySettings> {
+  const { data } = await api.get('/profile/visibility')
+  return data
+}
+
+export async function updateVisibilitySettings(
+  settings: Partial<VisibilitySettings>
+): Promise<VisibilitySettings> {
+  const { data } = await api.put('/profile/visibility', settings)
+  return data
+}
+
+export async function getPublicProfile(username: string): Promise<PublicProfile> {
+  const { data } = await api.get(`/profile/u/${encodeURIComponent(username)}`)
+  return data
+}
+
+export async function searchProfiles(query: string, limit = 20): Promise<ProfileSearchResult[]> {
+  const { data } = await api.get(`/profile/search?q=${encodeURIComponent(query)}&limit=${limit}`)
+  return data
+}
+
+// =============================================================================
+// AI Chat endpoints
+// =============================================================================
 
 export async function sendChatMessage(
   message: string,

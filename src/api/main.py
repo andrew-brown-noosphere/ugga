@@ -37,6 +37,7 @@ from src.api.users import router as users_router
 from src.api.instructors import router as instructors_router
 from src.api.payments import router as payments_router
 from src.api.progress import router as progress_router
+from src.api.profile import router as profile_router
 
 
 # Service dependency
@@ -96,6 +97,7 @@ app.include_router(users_router)
 app.include_router(instructors_router)
 app.include_router(payments_router)
 app.include_router(progress_router)
+app.include_router(profile_router)
 
 
 # =============================================================================

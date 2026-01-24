@@ -22,13 +22,14 @@ const defaultSubscription: SubscriptionState = {
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null)
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const { isSignedIn, getToken } = useAuth()
+  const { isSignedIn, isLoaded, getToken } = useAuth()
   const [subscription, setSubscription] = useState<SubscriptionState>(defaultSubscription)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const fetchSubscription = useCallback(async () => {
-    if (!isSignedIn) {
+    // Wait for Clerk to load before checking auth
+    if (!isLoaded || !isSignedIn) {
       setSubscription(defaultSubscription)
       return
     }
@@ -54,7 +55,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }, [isSignedIn, getToken])
+  }, [isLoaded, isSignedIn, getToken])
 
   // Fetch subscription on mount and when auth changes
   useEffect(() => {

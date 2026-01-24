@@ -11,6 +11,7 @@ import PlanPage from './pages/PlanPage'
 import InstructorsPage from './pages/InstructorsPage'
 import InstructorPage from './pages/InstructorPage'
 import ProfilePage from './pages/ProfilePage'
+import PublicProfilePage from './pages/PublicProfilePage'
 import PricingPage from './pages/PricingPage'
 import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import { PlanProvider, usePlan } from './context/PlanContext'
@@ -59,6 +60,7 @@ function AppContent() {
           <Route path="/instructors" element={<InstructorsPage />} />
           <Route path="/instructors/:id" element={<InstructorPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/u/:username" element={<PublicProfilePage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
         </Routes>
