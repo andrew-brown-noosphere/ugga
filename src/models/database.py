@@ -281,9 +281,9 @@ class Professor(Base):
     instructor_id: Mapped[Optional[int]] = mapped_column(ForeignKey("instructors.id"), index=True)
 
     # Basic info
-    name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)  # Full name for display
     first_name: Mapped[Optional[str]] = mapped_column(String(100))
-    last_name: Mapped[Optional[str]] = mapped_column(String(100), index=True)
+    last_name: Mapped[Optional[str]] = mapped_column(String(100))  # Index defined in __table_args__
 
     # Title and position
     title: Mapped[Optional[str]] = mapped_column(String(200))  # e.g., "Associate Professor"
@@ -291,7 +291,7 @@ class Professor(Base):
     is_department_head: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Contact
-    email: Mapped[Optional[str]] = mapped_column(String(200), index=True)
+    email: Mapped[Optional[str]] = mapped_column(String(200))  # Index defined in __table_args__
     phone: Mapped[Optional[str]] = mapped_column(String(50))
     office_location: Mapped[Optional[str]] = mapped_column(String(200))
     office_hours: Mapped[Optional[str]] = mapped_column(Text)
