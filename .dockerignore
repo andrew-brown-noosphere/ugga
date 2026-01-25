@@ -1,0 +1,35 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+
+# Data
+data/
+*.pdf
+
+# Vercel (not needed for Railway)
+api/
+vercel.json
+
+# Misc
+*.md
+LICENSE
+Makefile

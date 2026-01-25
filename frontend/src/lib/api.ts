@@ -32,7 +32,8 @@ import type {
   QuickProgress,
 } from '../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// In production, API is served from same origin. In dev, use localhost:8000
+const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:8000')
 
 const api = axios.create({
   baseURL: API_BASE_URL,
