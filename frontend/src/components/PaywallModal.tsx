@@ -203,10 +203,6 @@ export default function PaywallModal({ isOpen, onClose, feature }: PaywallModalP
             </button>
           </div>
 
-          {/* Guarantee */}
-          <p className="text-center text-xs text-gray-500 mt-4">
-            30-day money-back guarantee
-          </p>
         </div>
       </div>
     </div>

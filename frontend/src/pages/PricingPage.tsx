@@ -252,10 +252,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Money-back guarantee */}
-      <div className="text-center text-sm text-gray-500">
-        <p>30-day money-back guarantee. No questions asked.</p>
-      </div>
     </div>
   )
 }
