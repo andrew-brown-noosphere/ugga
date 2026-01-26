@@ -1491,10 +1491,6 @@ class InstructorFollow(Base):
     def __repr__(self) -> str:
         return f"<InstructorFollow(user={self.user_id}, instructor={self.instructor_id})>"
 
-    def __repr__(self) -> str:
-        target = f"user={self.target_user_id}" if self.target_user_id else f"instructor={self.target_instructor_id}"
-        return f"<ProfileLike(user={self.user_id}, {target})>"
-
 
 # =============================================================================
 # Database Engine and Session Management

@@ -1,32 +1,55 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Search, User, Star, Mail, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Search, User, Star, Mail, ChevronRight, ChevronLeft, Building2 } from 'lucide-react'
 import { getProfessors } from '../lib/api'
 
 const PAGE_SIZE = 25
 
+// Common UGA departments
+const DEPARTMENTS = [
+  { code: '', label: 'All Departments' },
+  { code: 'CSCI', label: 'Computer Science' },
+  { code: 'MATH', label: 'Mathematics' },
+  { code: 'ENGL', label: 'English' },
+  { code: 'BIOL', label: 'Biology' },
+  { code: 'CHEM', label: 'Chemistry' },
+  { code: 'PHYS', label: 'Physics' },
+  { code: 'PSYC', label: 'Psychology' },
+  { code: 'HIST', label: 'History' },
+  { code: 'POLS', label: 'Political Science' },
+  { code: 'ECON', label: 'Economics' },
+  { code: 'ACCT', label: 'Accounting' },
+  { code: 'MGMT', label: 'Management' },
+  { code: 'MKTG', label: 'Marketing' },
+]
+
 export default function InstructorsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const initialSearch = searchParams.get('search') || ''
+  const initialDept = searchParams.get('dept') || ''
   const [search, setSearch] = useState(initialSearch)
   const [searchTerm, setSearchTerm] = useState(initialSearch)
+  const [department, setDepartment] = useState(initialDept)
   const [page, setPage] = useState(0)
 
-  // Update search when URL changes (e.g., from external link)
+  // Update filters when URL changes
   useEffect(() => {
     const urlSearch = searchParams.get('search') || ''
-    if (urlSearch !== searchTerm) {
+    const urlDept = searchParams.get('dept') || ''
+    if (urlSearch !== searchTerm || urlDept !== department) {
       setSearch(urlSearch)
       setSearchTerm(urlSearch)
-      setPage(0) // Reset page on new search
+      setDepartment(urlDept)
+      setPage(0)
     }
   }, [searchParams])
 
   const { data: professors, isLoading } = useQuery({
-    queryKey: ['professors', searchTerm, page],
+    queryKey: ['professors', searchTerm, department, page],
     queryFn: () => getProfessors({
       search: searchTerm || undefined,
+      department: department || undefined,
       limit: PAGE_SIZE,
       offset: page * PAGE_SIZE
     }),
@@ -35,12 +58,22 @@ export default function InstructorsPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     setSearchTerm(search)
-    // Update URL with search param
-    if (search) {
-      setSearchParams({ search })
-    } else {
-      setSearchParams({})
-    }
+    setPage(0)
+    // Update URL with params
+    const params: Record<string, string> = {}
+    if (search) params.search = search
+    if (department) params.dept = department
+    setSearchParams(params)
+  }
+
+  const handleDepartmentChange = (dept: string) => {
+    setDepartment(dept)
+    setPage(0)
+    // Update URL
+    const params: Record<string, string> = {}
+    if (searchTerm) params.search = searchTerm
+    if (dept) params.dept = dept
+    setSearchParams(params)
   }
 
   return (
@@ -51,9 +84,9 @@ export default function InstructorsPage() {
         <p className="text-gray-600">Search and browse UGA faculty members</p>
       </div>
 
-      {/* Search */}
+      {/* Search & Filter */}
       <div className="card">
-        <form onSubmit={handleSearch} className="flex gap-4">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -63,6 +96,20 @@ export default function InstructorsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+          </div>
+          <div className="relative sm:w-48">
+            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <select
+              className="input pl-10 appearance-none"
+              value={department}
+              onChange={(e) => handleDepartmentChange(e.target.value)}
+            >
+              {DEPARTMENTS.map((d) => (
+                <option key={d.code} value={d.code}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
           </div>
           <button type="submit" className="btn btn-primary">
             Search

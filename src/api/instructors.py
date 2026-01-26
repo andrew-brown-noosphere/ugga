@@ -21,6 +21,7 @@ from src.api.schemas import (
 from src.models.database import (
     Professor,
     ProfessorCourse,
+    Department,
     User,
     BulletinCourse,
     get_session_factory,
@@ -53,8 +54,8 @@ async def list_instructors(
         )
 
     if department:
-        query = query.join(Professor.department).where(
-            func.lower(Professor.department.has(name=department))
+        query = query.join(Department).where(
+            Department.code == department.upper()
         )
 
     query = query.order_by(Professor.last_name, Professor.first_name)
