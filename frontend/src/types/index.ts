@@ -777,6 +777,6 @@ export interface UserFollowStats {
 }
 
 export interface ProfileLikeStats {
-  like_count: number
+  likes_count: number
   is_liked: boolean
 }

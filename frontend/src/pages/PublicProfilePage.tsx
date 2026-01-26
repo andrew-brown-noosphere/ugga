@@ -15,7 +15,7 @@ import {
   UserPlus,
   UserCheck,
 } from 'lucide-react'
-import { getPublicProfile, setAuthToken, followUser, unfollowUser, likeUser, unlikeUser, getFollowStats, getUserLikeStats } from '../lib/api'
+import { getPublicProfile, setAuthToken, followUser, unfollowUser, likeUser, unlikeUser, getUserLikeStats } from '../lib/api'
 import { clsx } from 'clsx'
 
 export default function PublicProfilePage() {
@@ -39,13 +39,7 @@ export default function PublicProfilePage() {
     enabled: !!username,
   })
 
-  // Get follow/like stats
-  const { data: followStats } = useQuery({
-    queryKey: ['followStats', profile?.id],
-    queryFn: () => getFollowStats(profile!.id),
-    enabled: !!profile?.id,
-  })
-
+  // Get like stats
   const { data: likeStats } = useQuery({
     queryKey: ['likeStats', profile?.id],
     queryFn: () => getUserLikeStats(profile!.id),
@@ -185,7 +179,7 @@ export default function PublicProfilePage() {
                       )}
                     >
                       <ThumbsUp className={clsx('h-4 w-4', profile.is_liked && 'fill-current')} />
-                      {likeStats?.total_likes || 0}
+                      {likeStats?.likes_count || 0}
                     </button>
                     <button
                       onClick={() => followMutation.mutate()}

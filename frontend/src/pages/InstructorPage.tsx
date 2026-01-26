@@ -52,7 +52,7 @@ export default function InstructorPage() {
     mutationFn: async () => {
       const token = await getToken()
       setAuthToken(token)
-      if (likeStats?.user_has_liked) {
+      if (likeStats?.is_liked) {
         return unlikeInstructor(professorId)
       }
       return likeInstructor(professorId)
@@ -187,13 +187,13 @@ export default function InstructorPage() {
                         disabled={likeMutation.isPending}
                         className={clsx(
                           'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                          likeStats?.user_has_liked
+                          likeStats?.is_liked
                             ? 'bg-brand-100 text-brand-700 hover:bg-brand-200'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         )}
                       >
-                        <ThumbsUp className={clsx('h-4 w-4', likeStats?.user_has_liked && 'fill-current')} />
-                        {likeStats?.total_likes || 0}
+                        <ThumbsUp className={clsx('h-4 w-4', likeStats?.is_liked && 'fill-current')} />
+                        {likeStats?.likes_count || 0}
                       </button>
                       <button
                         onClick={() => followMutation.mutate()}
@@ -222,7 +222,7 @@ export default function InstructorPage() {
                     <SignInButton mode="modal">
                       <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200">
                         <ThumbsUp className="h-4 w-4" />
-                        {likeStats?.total_likes || 0}
+                        {likeStats?.likes_count || 0}
                       </button>
                     </SignInButton>
                   )}
