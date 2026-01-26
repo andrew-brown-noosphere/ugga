@@ -94,8 +94,7 @@ export default function InstructorsPage() {
           </div>
         ) : (
           <>
-
-          professors?.map((prof) => (
+          {professors?.map((prof) => (
             <Link
               key={prof.id}
               to={`/instructors/${prof.id}`}
