@@ -15,6 +15,8 @@ import PublicProfilePage from './pages/PublicProfilePage'
 import PricingPage from './pages/PricingPage'
 import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import ChatPage from './pages/ChatPage'
+import StudyGroupsPage from './pages/StudyGroupsPage'
+import CohortsPage from './pages/CohortsPage'
 import { PlanProvider, usePlan } from './context/PlanContext'
 import { SubscriptionProvider } from './context/SubscriptionContext'
 
@@ -65,6 +67,8 @@ function AppContent() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/study-groups" element={<StudyGroupsPage />} />
+          <Route path="/cohorts" element={<CohortsPage />} />
         </Routes>
       </Layout>
 

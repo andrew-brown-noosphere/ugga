@@ -853,6 +853,9 @@ class User(Base):
     github_url: Mapped[Optional[str]] = mapped_column(String(255))
     twitter_url: Mapped[Optional[str]] = mapped_column(String(255))
     website_url: Mapped[Optional[str]] = mapped_column(String(255))
+    instagram_url: Mapped[Optional[str]] = mapped_column(String(255))
+    tiktok_url: Mapped[Optional[str]] = mapped_column(String(255))
+    bluesky_url: Mapped[Optional[str]] = mapped_column(String(255))
 
     # UGA Email Verification (required for social features)
     uga_email: Mapped[Optional[str]] = mapped_column(String(100), unique=True, nullable=True, index=True)
@@ -1287,6 +1290,186 @@ class Waitlist(Base):
 
     def __repr__(self) -> str:
         return f"<Waitlist(email='{self.email}', status='{self.status}')>"
+
+
+# =============================================================================
+# Social Features: Study Groups
+# =============================================================================
+
+class StudyGroup(Base):
+    """
+    A study group for a specific course.
+
+    Anyone with a verified UGA email can create a study group
+    and become its organizer.
+    """
+    __tablename__ = "study_groups"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    course_code: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+    # Meeting info
+    meeting_day: Mapped[Optional[str]] = mapped_column(String(20))
+    meeting_time: Mapped[Optional[str]] = mapped_column(String(50))
+    meeting_location: Mapped[Optional[str]] = mapped_column(String(200))
+
+    # Organizer
+    organizer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    # Settings
+    max_members: Mapped[int] = mapped_column(Integer, default=10)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    organizer: Mapped["User"] = relationship("User", foreign_keys=[organizer_id])
+    members: Mapped[list["StudyGroupMember"]] = relationship(
+        "StudyGroupMember", back_populates="study_group", cascade="all, delete-orphan"
+    )
+
+    def __repr__(self) -> str:
+        return f"<StudyGroup(id={self.id}, course='{self.course_code}', name='{self.name}')>"
+
+
+class StudyGroupMember(Base):
+    """Membership in a study group."""
+    __tablename__ = "study_group_members"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    study_group_id: Mapped[int] = mapped_column(ForeignKey("study_groups.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    study_group: Mapped["StudyGroup"] = relationship("StudyGroup", back_populates="members")
+    user: Mapped["User"] = relationship("User")
+
+    __table_args__ = (
+        Index("ix_sg_member_unique", "study_group_id", "user_id", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        return f"<StudyGroupMember(group={self.study_group_id}, user={self.user_id})>"
+
+
+# =============================================================================
+# Social Features: Cohorts
+# =============================================================================
+
+class Cohort(Base):
+    """
+    A cohort is a group of friends who want to take classes together.
+
+    Examples: couples, fraternity/sorority members, hometown friends.
+    """
+    __tablename__ = "cohorts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text)
+
+    # Creator/admin
+    created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    # Settings
+    is_public: Mapped[bool] = mapped_column(Boolean, default=False)
+    max_members: Mapped[int] = mapped_column(Integer, default=20)
+
+    # Invite code for private cohorts (8 characters)
+    invite_code: Mapped[str] = mapped_column(String(8), unique=True, nullable=False)
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    created_by: Mapped["User"] = relationship("User", foreign_keys=[created_by_id])
+    members: Mapped[list["CohortMember"]] = relationship(
+        "CohortMember", back_populates="cohort", cascade="all, delete-orphan"
+    )
+
+    def __repr__(self) -> str:
+        return f"<Cohort(id={self.id}, name='{self.name}')>"
+
+
+class CohortMember(Base):
+    """Membership in a cohort."""
+    __tablename__ = "cohort_members"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cohort_id: Mapped[int] = mapped_column(ForeignKey("cohorts.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    role: Mapped[str] = mapped_column(String(20), default="member")  # "admin", "member"
+    joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    cohort: Mapped["Cohort"] = relationship("Cohort", back_populates="members")
+    user: Mapped["User"] = relationship("User")
+
+    __table_args__ = (
+        Index("ix_cohort_member_unique", "cohort_id", "user_id", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        return f"<CohortMember(cohort={self.cohort_id}, user={self.user_id}, role='{self.role}')>"
+
+
+# =============================================================================
+# Social Features: Likes & Follows
+# =============================================================================
+
+class UserFollow(Base):
+    """User A follows User B."""
+    __tablename__ = "user_follows"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    follower_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    following_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    follower: Mapped["User"] = relationship("User", foreign_keys=[follower_id])
+    following: Mapped["User"] = relationship("User", foreign_keys=[following_id])
+
+    __table_args__ = (
+        Index("ix_follow_unique", "follower_id", "following_id", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        return f"<UserFollow(follower={self.follower_id}, following={self.following_id})>"
+
+
+class ProfileLike(Base):
+    """User likes a profile (student or instructor)."""
+    __tablename__ = "profile_likes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    # Target - either a user or an instructor (one must be set)
+    target_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), index=True)
+    target_instructor_id: Mapped[Optional[int]] = mapped_column(ForeignKey("instructors.id"), index=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", foreign_keys=[user_id])
+    target_user: Mapped[Optional["User"]] = relationship("User", foreign_keys=[target_user_id])
+    target_instructor: Mapped[Optional["Instructor"]] = relationship("Instructor")
+
+    __table_args__ = (
+        Index("ix_like_user_unique", "user_id", "target_user_id", unique=True),
+        Index("ix_like_instructor_unique", "user_id", "target_instructor_id", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        target = f"user={self.target_user_id}" if self.target_user_id else f"instructor={self.target_instructor_id}"
+        return f"<ProfileLike(user={self.user_id}, {target})>"
 
 
 # =============================================================================

@@ -1,21 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
-import { useAuth } from '@clerk/clerk-react'
 import { useMutation } from '@tanstack/react-query'
-import { MessageCircle, X, Send, Loader2, Bot, User, Sparkles, ExternalLink, LogIn, Mail, CheckCircle } from 'lucide-react'
+import { MessageCircle, X, Send, Loader2, Bot, User, Sparkles, Mail, CheckCircle } from 'lucide-react'
 import { clsx } from 'clsx'
-import { sendChatMessage, setAuthToken, joinWaitlist } from '../lib/api'
-import type { ChatMessage, ChatSource } from '../types'
+import { joinWaitlist } from '../lib/api'
+import type { ChatMessage } from '../types'
 
 interface ChatPanelProps {
   className?: string
 }
 
 export default function ChatPanel({ className }: ChatPanelProps) {
-  const { getToken, isSignedIn } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [sources, setSources] = useState<ChatSource[]>([])
   const [showWaitlist, setShowWaitlist] = useState(false)
   const [waitlistEmail, setWaitlistEmail] = useState('')
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false)
@@ -49,7 +46,7 @@ export default function ChatPanel({ className }: ChatPanelProps) {
 
   // For now, always show waitlist instead of real AI (beta mode)
   const chatMutation = useMutation({
-    mutationFn: async (message: string) => {
+    mutationFn: async (_message: string) => {
       // Simulate a brief delay for natural feel
       await new Promise(resolve => setTimeout(resolve, 800))
       // Don't actually call AI - just trigger waitlist flow
@@ -69,7 +66,6 @@ export default function ChatPanel({ className }: ChatPanelProps) {
     const userMessage = input.trim()
     setInput('')
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }])
-    setSources([])
     chatMutation.mutate(userMessage)
   }
 

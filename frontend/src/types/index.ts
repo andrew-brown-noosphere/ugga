@@ -158,6 +158,13 @@ export interface User {
   github_url: string | null
   twitter_url: string | null
   website_url: string | null
+  instagram_url: string | null
+  tiktok_url: string | null
+  bluesky_url: string | null
+  // Verification
+  uga_email: string | null
+  uga_email_verified: boolean
+  username: string | null
   created_at: string
 }
 
@@ -172,6 +179,9 @@ export interface UserUpdateRequest {
   github_url?: string
   twitter_url?: string
   website_url?: string
+  instagram_url?: string
+  tiktok_url?: string
+  bluesky_url?: string
 }
 
 export interface DegreeProgress {
@@ -635,6 +645,9 @@ export interface PublicProfile {
   github_url: string | null
   twitter_url: string | null
   website_url: string | null
+  instagram_url: string | null
+  tiktok_url: string | null
+  bluesky_url: string | null
   is_verified: boolean
   is_own_profile: boolean
 }
@@ -644,4 +657,123 @@ export interface ProfileSearchResult {
   display_name: string
   photo_url: string | null
   major: string | null
+}
+
+// =============================================================================
+// Study Groups Types
+// =============================================================================
+
+export interface StudyGroup {
+  id: number
+  course_code: string
+  name: string
+  description: string | null
+  meeting_day: string | null
+  meeting_time: string | null
+  meeting_location: string | null
+  organizer_id: number
+  organizer_username: string | null
+  organizer_first_name: string | null
+  max_members: number
+  member_count: number
+  is_active: boolean
+  is_member: boolean
+  is_organizer: boolean
+  created_at: string
+}
+
+export interface StudyGroupMember {
+  id: number
+  user_id: number
+  username: string | null
+  first_name: string | null
+  photo_url: string | null
+  joined_at: string
+}
+
+export interface StudyGroupCreateRequest {
+  course_code: string
+  name: string
+  description?: string
+  meeting_day?: string
+  meeting_time?: string
+  meeting_location?: string
+  max_members?: number
+}
+
+export interface StudyGroupUpdateRequest {
+  name?: string
+  description?: string
+  meeting_day?: string
+  meeting_time?: string
+  meeting_location?: string
+  max_members?: number
+  is_active?: boolean
+}
+
+// =============================================================================
+// Cohorts Types
+// =============================================================================
+
+export interface Cohort {
+  id: number
+  name: string
+  description: string | null
+  created_by_id: number
+  created_by_username: string | null
+  is_public: boolean
+  max_members: number
+  invite_code: string | null  // Only visible to members
+  member_count: number
+  is_member: boolean
+  is_admin: boolean
+  created_at: string
+}
+
+export interface CohortMember {
+  id: number
+  user_id: number
+  username: string | null
+  first_name: string | null
+  photo_url: string | null
+  role: string
+  joined_at: string
+}
+
+export interface CohortCreateRequest {
+  name: string
+  description?: string
+  is_public?: boolean
+  max_members?: number
+}
+
+export interface CohortUpdateRequest {
+  name?: string
+  description?: string
+  is_public?: boolean
+  max_members?: number
+}
+
+// =============================================================================
+// Social (Follows & Likes) Types
+// =============================================================================
+
+export interface FollowUser {
+  id: number
+  user_id: number
+  username: string | null
+  first_name: string | null
+  photo_url: string | null
+  created_at: string
+}
+
+export interface UserFollowStats {
+  follower_count: number
+  following_count: number
+  is_following: boolean
+}
+
+export interface ProfileLikeStats {
+  like_count: number
+  is_liked: boolean
 }

@@ -1,0 +1,32 @@
+# Minimal requirements for Vercel serverless
+# Excludes: playwright, pandas, pdfplumber, pytest (too large)
+
+# API Framework
+fastapi>=0.109.0
+uvicorn>=0.27.0
+
+# Database - PostgreSQL
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# Vector Search (pgvector)
+pgvector>=0.2.0
+
+# OpenAI (embeddings)
+openai>=1.0.0
+
+# Anthropic (AI features)
+anthropic>=0.18.0
+
+# Data validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# HTTP client
+httpx>=0.26.0
+
+# Payments (Stripe)
+stripe>=7.0.0

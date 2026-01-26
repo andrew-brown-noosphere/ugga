@@ -739,10 +739,22 @@ async def scrape_all_programs(
         program_types = ["UG", "GM", "MINOR", "CERT-UG", "CERT-GM", "PR"]
 
     async with BulletinScraper() as scraper:
-        # Search for programs
-        logger.info(f"Searching for programs: {program_types}")
-        program_list = await scraper.search_programs(program_types=program_types)
-        logger.info(f"Found {len(program_list)} programs")
+        # Search each type separately to avoid pagination issues
+        program_list = []
+        seen_ids = set()
+
+        for ptype in program_types:
+            logger.info(f"Searching for {ptype} programs...")
+            results = await scraper.search_programs(program_types=[ptype])
+            for item in results:
+                # Deduplicate by bulletin_id
+                if item[1] not in seen_ids:
+                    program_list.append(item)
+                    seen_ids.add(item[1])
+            logger.info(f"  Found {len(results)} {ptype} programs ({len(program_list)} total unique)")
+            await asyncio.sleep(1)  # Be nice to the server
+
+        logger.info(f"Total unique programs found: {len(program_list)}")
 
         if limit:
             program_list = program_list[:limit]

@@ -57,6 +57,9 @@ export default function ProfilePage() {
   const [githubUrl, setGithubUrl] = useState('')
   const [twitterUrl, setTwitterUrl] = useState('')
   const [websiteUrl, setWebsiteUrl] = useState('')
+  const [instagramUrl, setInstagramUrl] = useState('')
+  const [tiktokUrl, setTiktokUrl] = useState('')
+  const [blueskyUrl, setBlueskyUrl] = useState('')
 
   const { data: user, isLoading: loadingUser } = useQuery({
     queryKey: ['user'],
@@ -89,6 +92,9 @@ export default function ProfilePage() {
       setGithubUrl(user.github_url || '')
       setTwitterUrl(user.twitter_url || '')
       setWebsiteUrl(user.website_url || '')
+      setInstagramUrl(user.instagram_url || '')
+      setTiktokUrl(user.tiktok_url || '')
+      setBlueskyUrl(user.bluesky_url || '')
     }
   }, [user])
 
@@ -104,6 +110,9 @@ export default function ProfilePage() {
       github_url?: string
       twitter_url?: string
       website_url?: string
+      instagram_url?: string
+      tiktok_url?: string
+      bluesky_url?: string
     }) => updateUserPreferences(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] })
@@ -124,6 +133,9 @@ export default function ProfilePage() {
       github_url: githubUrl || undefined,
       twitter_url: twitterUrl || undefined,
       website_url: websiteUrl || undefined,
+      instagram_url: instagramUrl || undefined,
+      tiktok_url: tiktokUrl || undefined,
+      bluesky_url: blueskyUrl || undefined,
     })
   }
 
@@ -378,6 +390,36 @@ export default function ProfilePage() {
                     placeholder="https://yourwebsite.com"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Instagram</label>
+                  <input
+                    type="url"
+                    className="input"
+                    value={instagramUrl}
+                    onChange={(e) => setInstagramUrl(e.target.value)}
+                    placeholder="https://instagram.com/yourusername"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">TikTok</label>
+                  <input
+                    type="url"
+                    className="input"
+                    value={tiktokUrl}
+                    onChange={(e) => setTiktokUrl(e.target.value)}
+                    placeholder="https://tiktok.com/@yourusername"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">BlueSky</label>
+                  <input
+                    type="url"
+                    className="input"
+                    value={blueskyUrl}
+                    onChange={(e) => setBlueskyUrl(e.target.value)}
+                    placeholder="https://bsky.app/profile/you.bsky.social"
+                  />
+                </div>
               </div>
             </div>
 
@@ -440,7 +482,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Social Links Display */}
-            {(user?.linkedin_url || user?.github_url || user?.twitter_url || user?.website_url) && (
+            {(user?.linkedin_url || user?.github_url || user?.twitter_url || user?.website_url || user?.instagram_url || user?.tiktok_url || user?.bluesky_url) && (
               <div className="flex flex-wrap gap-3">
                 {user?.linkedin_url && (
                   <a
@@ -484,6 +526,39 @@ export default function ProfilePage() {
                   >
                     <LinkIcon className="h-4 w-4" />
                     Website
+                  </a>
+                )}
+                {user?.instagram_url && (
+                  <a
+                    href={user.instagram_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-800"
+                  >
+                    <LinkIcon className="h-4 w-4" />
+                    Instagram
+                  </a>
+                )}
+                {user?.tiktok_url && (
+                  <a
+                    href={user.tiktok_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-800"
+                  >
+                    <LinkIcon className="h-4 w-4" />
+                    TikTok
+                  </a>
+                )}
+                {user?.bluesky_url && (
+                  <a
+                    href={user.bluesky_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-800"
+                  >
+                    <LinkIcon className="h-4 w-4" />
+                    BlueSky
                   </a>
                 )}
               </div>

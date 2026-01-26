@@ -140,6 +140,9 @@ class PublicProfileResponse(BaseModel):
     github_url: Optional[str]
     twitter_url: Optional[str]
     website_url: Optional[str]
+    instagram_url: Optional[str]
+    tiktok_url: Optional[str]
+    bluesky_url: Optional[str]
     # Meta
     is_verified: bool
     is_own_profile: bool
@@ -441,6 +444,9 @@ async def get_public_profile(
             response["github_url"] = user.github_url
             response["twitter_url"] = user.twitter_url
             response["website_url"] = user.website_url
+            response["instagram_url"] = user.instagram_url
+            response["tiktok_url"] = user.tiktok_url
+            response["bluesky_url"] = user.bluesky_url
 
         # Sensitive fields - only if explicitly enabled
         if settings.get("show_completed_courses", False) or is_own_profile:

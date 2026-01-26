@@ -42,6 +42,9 @@ from src.api.payments import router as payments_router
 from src.api.progress import router as progress_router
 from src.api.profile import router as profile_router
 from src.api.chat import router as chat_router
+from src.api.study_groups import router as study_groups_router
+from src.api.cohorts import router as cohorts_router
+from src.api.social import router as social_router
 
 
 # Service dependency
@@ -103,6 +106,9 @@ app.include_router(payments_router)
 app.include_router(progress_router)
 app.include_router(profile_router)
 app.include_router(chat_router)
+app.include_router(study_groups_router)
+app.include_router(cohorts_router)
+app.include_router(social_router)
 
 
 # =============================================================================

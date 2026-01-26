@@ -386,6 +386,9 @@ class UserResponse(BaseModel):
     github_url: Optional[str] = None
     twitter_url: Optional[str] = None
     website_url: Optional[str] = None
+    instagram_url: Optional[str] = None
+    tiktok_url: Optional[str] = None
+    bluesky_url: Optional[str] = None
     created_at: datetime
 
 
@@ -403,6 +406,9 @@ class UserUpdateRequest(BaseModel):
     github_url: Optional[str] = Field(None, max_length=255)
     twitter_url: Optional[str] = Field(None, max_length=255)
     website_url: Optional[str] = Field(None, max_length=255)
+    instagram_url: Optional[str] = Field(None, max_length=255)
+    tiktok_url: Optional[str] = Field(None, max_length=255)
+    bluesky_url: Optional[str] = Field(None, max_length=255)
 
 
 class DegreeProgressResponse(BaseModel):
@@ -824,3 +830,147 @@ class QuickProgressResponse(BaseModel):
     upper_division_hours: Optional[int] = None
     program_name: Optional[str] = None
     progress_percent: float = 0
+
+
+# =============================================================================
+# Study Group Schemas
+# =============================================================================
+
+class StudyGroupMemberResponse(BaseModel):
+    """Study group member info."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    photo_url: Optional[str] = None
+    joined_at: datetime
+
+
+class StudyGroupResponse(BaseModel):
+    """Study group details."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    course_code: str
+    name: str
+    description: Optional[str] = None
+    meeting_day: Optional[str] = None
+    meeting_time: Optional[str] = None
+    meeting_location: Optional[str] = None
+    organizer_id: int
+    organizer_username: Optional[str] = None
+    organizer_first_name: Optional[str] = None
+    max_members: int
+    member_count: int = 0
+    is_active: bool
+    is_member: bool = False
+    is_organizer: bool = False
+    created_at: datetime
+
+
+class StudyGroupCreateRequest(BaseModel):
+    """Create a study group."""
+    course_code: str = Field(..., min_length=4, max_length=20)
+    name: str = Field(..., min_length=3, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    meeting_day: Optional[str] = Field(None, max_length=20)
+    meeting_time: Optional[str] = Field(None, max_length=50)
+    meeting_location: Optional[str] = Field(None, max_length=200)
+    max_members: int = Field(10, ge=2, le=50)
+
+
+class StudyGroupUpdateRequest(BaseModel):
+    """Update a study group."""
+    name: Optional[str] = Field(None, min_length=3, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    meeting_day: Optional[str] = Field(None, max_length=20)
+    meeting_time: Optional[str] = Field(None, max_length=50)
+    meeting_location: Optional[str] = Field(None, max_length=200)
+    max_members: Optional[int] = Field(None, ge=2, le=50)
+    is_active: Optional[bool] = None
+
+
+# =============================================================================
+# Cohort Schemas
+# =============================================================================
+
+class CohortMemberResponse(BaseModel):
+    """Cohort member info."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    photo_url: Optional[str] = None
+    role: str
+    joined_at: datetime
+
+
+class CohortResponse(BaseModel):
+    """Cohort details."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: Optional[str] = None
+    created_by_id: int
+    created_by_username: Optional[str] = None
+    is_public: bool
+    max_members: int
+    member_count: int = 0
+    invite_code: Optional[str] = None  # Only shown to members
+    is_member: bool = False
+    is_admin: bool = False
+    created_at: datetime
+
+
+class CohortCreateRequest(BaseModel):
+    """Create a cohort."""
+    name: str = Field(..., min_length=2, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    is_public: bool = False
+    max_members: int = Field(20, ge=2, le=100)
+
+
+class CohortUpdateRequest(BaseModel):
+    """Update a cohort."""
+    name: Optional[str] = Field(None, min_length=2, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+    is_public: Optional[bool] = None
+    max_members: Optional[int] = Field(None, ge=2, le=100)
+
+
+class CohortJoinRequest(BaseModel):
+    """Join a cohort via invite code."""
+    invite_code: str = Field(..., min_length=8, max_length=8)
+
+
+# =============================================================================
+# Social Schemas (Likes & Follows)
+# =============================================================================
+
+class FollowResponse(BaseModel):
+    """Follow relationship."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    follower_id: int
+    following_id: int
+    created_at: datetime
+
+
+class UserFollowStats(BaseModel):
+    """User follow statistics."""
+    followers_count: int
+    following_count: int
+    is_following: bool = False
+    is_followed_by: bool = False
+
+
+class ProfileLikeStats(BaseModel):
+    """Profile like statistics."""
+    likes_count: int
+    is_liked: bool = False

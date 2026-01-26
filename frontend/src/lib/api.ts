@@ -186,6 +186,9 @@ export async function updateUserPreferences(preferences: {
   github_url?: string
   twitter_url?: string
   website_url?: string
+  instagram_url?: string
+  tiktok_url?: string
+  bluesky_url?: string
 }): Promise<User> {
   const { data } = await api.put('/users/me', preferences)
   return data
@@ -471,6 +474,194 @@ export async function getWaitlistCount(): Promise<{
   spots_remaining: number
 }> {
   const { data } = await api.get('/waitlist/count')
+  return data
+}
+
+// =============================================================================
+// Study Groups endpoints
+// =============================================================================
+
+import type {
+  StudyGroup,
+  StudyGroupMember,
+  StudyGroupCreateRequest,
+  StudyGroupUpdateRequest,
+  Cohort,
+  CohortMember,
+  CohortCreateRequest,
+  CohortUpdateRequest,
+  FollowUser,
+  UserFollowStats,
+  ProfileLikeStats,
+} from '../types'
+
+export async function getStudyGroups(options?: {
+  course_code?: string
+  active_only?: boolean
+  limit?: number
+}): Promise<StudyGroup[]> {
+  const params = new URLSearchParams()
+  if (options?.course_code) params.append('course_code', options.course_code)
+  if (options?.active_only !== undefined) params.append('active_only', String(options.active_only))
+  if (options?.limit) params.append('limit', String(options.limit))
+  const { data } = await api.get(`/study-groups?${params}`)
+  return data
+}
+
+export async function getStudyGroup(groupId: number): Promise<StudyGroup> {
+  const { data } = await api.get(`/study-groups/${groupId}`)
+  return data
+}
+
+export async function getStudyGroupMembers(groupId: number): Promise<StudyGroupMember[]> {
+  const { data } = await api.get(`/study-groups/${groupId}/members`)
+  return data
+}
+
+export async function createStudyGroup(request: StudyGroupCreateRequest): Promise<StudyGroup> {
+  const { data } = await api.post('/study-groups', request)
+  return data
+}
+
+export async function updateStudyGroup(
+  groupId: number,
+  request: StudyGroupUpdateRequest
+): Promise<StudyGroup> {
+  const { data } = await api.put(`/study-groups/${groupId}`, request)
+  return data
+}
+
+export async function deleteStudyGroup(groupId: number): Promise<void> {
+  await api.delete(`/study-groups/${groupId}`)
+}
+
+export async function joinStudyGroup(groupId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/study-groups/${groupId}/join`)
+  return data
+}
+
+export async function leaveStudyGroup(groupId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/study-groups/${groupId}/leave`)
+  return data
+}
+
+// =============================================================================
+// Cohorts endpoints
+// =============================================================================
+
+export async function getMyCohorts(): Promise<Cohort[]> {
+  const { data } = await api.get('/cohorts')
+  return data
+}
+
+export async function getCohort(cohortId: number): Promise<Cohort> {
+  const { data } = await api.get(`/cohorts/${cohortId}`)
+  return data
+}
+
+export async function getCohortMembers(cohortId: number): Promise<CohortMember[]> {
+  const { data } = await api.get(`/cohorts/${cohortId}/members`)
+  return data
+}
+
+export async function createCohort(request: CohortCreateRequest): Promise<Cohort> {
+  const { data } = await api.post('/cohorts', request)
+  return data
+}
+
+export async function updateCohort(
+  cohortId: number,
+  request: CohortUpdateRequest
+): Promise<Cohort> {
+  const { data } = await api.put(`/cohorts/${cohortId}`, request)
+  return data
+}
+
+export async function deleteCohort(cohortId: number): Promise<void> {
+  await api.delete(`/cohorts/${cohortId}`)
+}
+
+export async function joinCohortByCode(inviteCode: string): Promise<Cohort> {
+  const { data } = await api.post('/cohorts/join', { invite_code: inviteCode })
+  return data
+}
+
+export async function leaveCohort(cohortId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/cohorts/${cohortId}/leave`)
+  return data
+}
+
+export async function promoteCohortMember(
+  cohortId: number,
+  userId: number
+): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/cohorts/${cohortId}/promote/${userId}`)
+  return data
+}
+
+export async function regenerateCohortCode(
+  cohortId: number
+): Promise<{ success: boolean; invite_code: string }> {
+  const { data } = await api.post(`/cohorts/${cohortId}/regenerate-code`)
+  return data
+}
+
+// =============================================================================
+// Social (Follows & Likes) endpoints
+// =============================================================================
+
+export async function followUser(userId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/social/users/${userId}/follow`)
+  return data
+}
+
+export async function unfollowUser(userId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.delete(`/social/users/${userId}/follow`)
+  return data
+}
+
+export async function getFollowers(userId: number): Promise<FollowUser[]> {
+  const { data } = await api.get(`/social/users/${userId}/followers`)
+  return data
+}
+
+export async function getFollowing(userId: number): Promise<FollowUser[]> {
+  const { data } = await api.get(`/social/users/${userId}/following`)
+  return data
+}
+
+export async function getFollowStats(userId: number): Promise<UserFollowStats> {
+  const { data } = await api.get(`/social/users/${userId}/follow-stats`)
+  return data
+}
+
+export async function likeUser(userId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/social/users/${userId}/like`)
+  return data
+}
+
+export async function unlikeUser(userId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.delete(`/social/users/${userId}/like`)
+  return data
+}
+
+export async function getUserLikeStats(userId: number): Promise<ProfileLikeStats> {
+  const { data } = await api.get(`/social/users/${userId}/like-stats`)
+  return data
+}
+
+export async function likeInstructor(instructorId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/social/instructors/${instructorId}/like`)
+  return data
+}
+
+export async function unlikeInstructor(instructorId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.delete(`/social/instructors/${instructorId}/like`)
+  return data
+}
+
+export async function getInstructorLikeStats(instructorId: number): Promise<ProfileLikeStats> {
+  const { data } = await api.get(`/social/instructors/${instructorId}/like-stats`)
   return data
 }
 
