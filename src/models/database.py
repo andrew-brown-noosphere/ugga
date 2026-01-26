@@ -891,6 +891,9 @@ class User(Base):
     transcript_summary: Mapped[Optional["UserTranscriptSummary"]] = relationship(
         "UserTranscriptSummary", back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
+    planned_sections: Mapped[list["PlannedSection"]] = relationship(
+        "PlannedSection", back_populates="user", cascade="all, delete-orphan"
+    )
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -1031,6 +1034,49 @@ class UserCompletedCourse(Base):
 
     def __repr__(self) -> str:
         return f"<UserCompletedCourse(user_id={self.user_id}, course='{self.course_code}', grade='{self.grade}')>"
+
+
+class PlannedSection(Base):
+    """
+    A section the user plans to take for an upcoming semester.
+
+    This is their "shopping cart" for course registration - the specific
+    sections they want to register for.
+    """
+    __tablename__ = "planned_sections"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    # Section identification
+    crn: Mapped[str] = mapped_column(String(10), nullable=False)
+    course_code: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+
+    # Denormalized for display (so we don't need joins)
+    course_title: Mapped[Optional[str]] = mapped_column(String(200))
+    instructor: Mapped[Optional[str]] = mapped_column(String(100))
+    days: Mapped[Optional[str]] = mapped_column(String(20))
+    start_time: Mapped[Optional[str]] = mapped_column(String(20))
+    end_time: Mapped[Optional[str]] = mapped_column(String(20))
+    building: Mapped[Optional[str]] = mapped_column(String(50))
+    room: Mapped[Optional[str]] = mapped_column(String(20))
+
+    # Semester this section is for
+    semester: Mapped[str] = mapped_column(String(20), nullable=False, index=True)  # "Spring 2026"
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="planned_sections")
+
+    __table_args__ = (
+        Index("ix_planned_section_user_semester", "user_id", "semester"),
+        Index("ix_planned_section_unique", "user_id", "crn", "semester", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        return f"<PlannedSection(user_id={self.user_id}, crn='{self.crn}', course='{self.course_code}')>"
 
 
 class UserProgramEnrollment(Base):

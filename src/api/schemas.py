@@ -725,6 +725,48 @@ class CompletedCoursesResponse(BaseModel):
     total: int
 
 
+# =============================================================================
+# Planned Sections (Semester Schedule)
+# =============================================================================
+
+class PlannedSectionCreate(BaseModel):
+    """Request to add a section to the user's plan."""
+    crn: str = Field(..., description="Course Reference Number")
+    course_code: str = Field(..., description="Course code (e.g., CSCI 1302)")
+    course_title: Optional[str] = Field(None, description="Course title")
+    instructor: Optional[str] = Field(None, description="Instructor name")
+    days: Optional[str] = Field(None, description="Meeting days (e.g., M W F)")
+    start_time: Optional[str] = Field(None, description="Start time")
+    end_time: Optional[str] = Field(None, description="End time")
+    building: Optional[str] = Field(None, description="Building")
+    room: Optional[str] = Field(None, description="Room number")
+    semester: str = Field(..., description="Semester (e.g., Spring 2026)")
+
+
+class PlannedSectionResponse(BaseModel):
+    """Response for a planned section."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    crn: str
+    course_code: str
+    course_title: Optional[str] = None
+    instructor: Optional[str] = None
+    days: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    building: Optional[str] = None
+    room: Optional[str] = None
+    semester: str
+    created_at: datetime
+
+
+class PlannedSectionsResponse(BaseModel):
+    """Response with list of planned sections."""
+    sections: list[PlannedSectionResponse]
+    total: int
+
+
 class TranscriptSummaryResponse(BaseModel):
     """Transcript summary with GPA and hours."""
     model_config = ConfigDict(from_attributes=True)

@@ -19,6 +19,10 @@ from src.api.schemas import (
     CompletedCourseUpdate,
     CompletedCourseResponse,
     CompletedCoursesResponse,
+    # Planned sections
+    PlannedSectionCreate,
+    PlannedSectionResponse,
+    PlannedSectionsResponse,
     # Transcript
     TranscriptSummaryResponse,
     # Enrollments
@@ -472,3 +476,102 @@ async def get_quick_progress(
     """Get quick progress summary without full audit."""
     result = service.get_quick_progress(user.id)
     return QuickProgressResponse(**result)
+
+
+# =============================================================================
+# Planned Sections (Semester Schedule) Endpoints
+# =============================================================================
+
+@router.get("/planned", response_model=PlannedSectionsResponse)
+async def get_planned_sections(
+    semester: Optional[str] = Query(None, description="Filter by semester (e.g., Spring 2026)"),
+    user: User = Depends(get_current_user),
+):
+    """Get user's planned sections for a semester."""
+    from src.models.database import PlannedSection
+
+    session_factory = get_session_factory()
+    with session_factory() as session:
+        query = session.query(PlannedSection).filter(
+            PlannedSection.user_id == user.id
+        )
+
+        if semester:
+            query = query.filter(PlannedSection.semester == semester)
+
+        query = query.order_by(PlannedSection.created_at.desc())
+        sections = query.all()
+
+        return PlannedSectionsResponse(
+            sections=[PlannedSectionResponse.model_validate(s) for s in sections],
+            total=len(sections),
+        )
+
+
+@router.post("/planned", response_model=PlannedSectionResponse)
+async def add_planned_section(
+    data: PlannedSectionCreate,
+    user: User = Depends(get_current_user),
+):
+    """Add a section to the user's plan."""
+    from src.models.database import PlannedSection
+    from sqlalchemy.exc import IntegrityError
+
+    session_factory = get_session_factory()
+    with session_factory() as session:
+        # Check if already added
+        existing = session.query(PlannedSection).filter(
+            PlannedSection.user_id == user.id,
+            PlannedSection.crn == data.crn,
+            PlannedSection.semester == data.semester,
+        ).first()
+
+        if existing:
+            raise HTTPException(status_code=400, detail="Section already in your plan")
+
+        section = PlannedSection(
+            user_id=user.id,
+            crn=data.crn,
+            course_code=data.course_code,
+            course_title=data.course_title,
+            instructor=data.instructor,
+            days=data.days,
+            start_time=data.start_time,
+            end_time=data.end_time,
+            building=data.building,
+            room=data.room,
+            semester=data.semester,
+        )
+
+        session.add(section)
+        try:
+            session.commit()
+            session.refresh(section)
+            return PlannedSectionResponse.model_validate(section)
+        except IntegrityError:
+            session.rollback()
+            raise HTTPException(status_code=400, detail="Section already in your plan")
+
+
+@router.delete("/planned/{section_id}")
+async def remove_planned_section(
+    section_id: int,
+    user: User = Depends(get_current_user),
+):
+    """Remove a section from the user's plan."""
+    from src.models.database import PlannedSection
+
+    session_factory = get_session_factory()
+    with session_factory() as session:
+        section = session.query(PlannedSection).filter(
+            PlannedSection.id == section_id,
+            PlannedSection.user_id == user.id,
+        ).first()
+
+        if not section:
+            raise HTTPException(status_code=404, detail="Section not found in your plan")
+
+        session.delete(section)
+        session.commit()
+
+        return {"status": "removed"}

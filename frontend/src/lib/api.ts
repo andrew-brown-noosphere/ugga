@@ -25,6 +25,9 @@ import type {
   CompletedCourse,
   CompletedCourseCreate,
   CompletedCoursesResponse,
+  PlannedSection,
+  PlannedSectionCreate,
+  PlannedSectionsResponse,
   TranscriptSummary,
   ProgramEnrollment,
   ProgramEnrollmentCreate,
@@ -331,6 +334,22 @@ export async function updateCompletedCourse(
 
 export async function deleteCompletedCourse(courseId: number): Promise<void> {
   await api.delete(`/progress/courses/${courseId}`)
+}
+
+// Planned Sections (Semester Schedule)
+export async function getPlannedSections(semester?: string): Promise<PlannedSectionsResponse> {
+  const params = semester ? `?semester=${encodeURIComponent(semester)}` : ''
+  const { data } = await api.get(`/progress/planned${params}`)
+  return data
+}
+
+export async function addPlannedSection(section: PlannedSectionCreate): Promise<PlannedSection> {
+  const { data } = await api.post('/progress/planned', section)
+  return data
+}
+
+export async function removePlannedSection(sectionId: number): Promise<void> {
+  await api.delete(`/progress/planned/${sectionId}`)
 }
 
 // Transcript Summary

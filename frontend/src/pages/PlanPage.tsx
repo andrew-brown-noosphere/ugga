@@ -35,6 +35,9 @@ import {
   getCoursePossibilities,
   getCompletedCourses,
   getQuickProgress,
+  getPlannedSections,
+  addPlannedSection,
+  removePlannedSection,
   setAuthToken,
   joinWaitlist,
 } from '../lib/api'
@@ -485,6 +488,23 @@ export default function PlanPage() {
   const [showCourseEntry, setShowCourseEntry] = useState(false)
   const [waitlistEmail, setWaitlistEmail] = useState('')
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false)
+  const [selectedSection, setSelectedSection] = useState<{
+    id: string  // courseCode-crn
+    crn: string
+    courseCode: string
+    title?: string
+    instructor: string
+    days: string
+    startTime: string
+    endTime: string
+    building?: string | null
+    room?: string | null
+    seatsAvailable: number
+    classSize: number
+  } | null>(null)
+
+  // Current semester for planning
+  const currentSemester = 'Spring 2026'
 
   // Waitlist mutation
   const waitlistMutation = useMutation({
@@ -495,6 +515,59 @@ export default function PlanPage() {
       setWaitlistSubmitted(true)
     },
   })
+
+  // Planned sections query
+  const { data: plannedSections, refetch: refetchPlanned } = useQuery({
+    queryKey: ['plannedSections', currentSemester],
+    queryFn: async () => {
+      const token = await getToken()
+      setAuthToken(token)
+      return getPlannedSections(currentSemester)
+    },
+    enabled: isSignedIn,
+  })
+
+  // Add to plan mutation
+  const addToPlanMutation = useMutation({
+    mutationFn: async (section: typeof selectedSection) => {
+      if (!section) throw new Error('No section selected')
+      const token = await getToken()
+      setAuthToken(token)
+      return addPlannedSection({
+        crn: section.crn,
+        course_code: section.courseCode,
+        course_title: section.title,
+        instructor: section.instructor,
+        days: section.days,
+        start_time: section.startTime,
+        end_time: section.endTime,
+        building: section.building || undefined,
+        room: section.room || undefined,
+        semester: currentSemester,
+      })
+    },
+    onSuccess: () => {
+      refetchPlanned()
+      setSelectedSection(null)
+    },
+  })
+
+  // Remove from plan mutation
+  const removeFromPlanMutation = useMutation({
+    mutationFn: async (sectionId: number) => {
+      const token = await getToken()
+      setAuthToken(token)
+      return removePlannedSection(sectionId)
+    },
+    onSuccess: () => {
+      refetchPlanned()
+    },
+  })
+
+  // Check if a section is already in the plan
+  const isInPlan = (crn: string) => {
+    return plannedSections?.sections.some(s => s.crn === crn) || false
+  }
 
   useEffect(() => {
     if (isLoaded && isSignedIn && !hasPlan) {
@@ -703,17 +776,36 @@ export default function PlanPage() {
   const scheduleBlocks = useMemo(() => {
     if (!possibilities?.possibilities) return []
     const blocks: Array<{
-      id: string; courseCode: string; title?: string; instructor: string;
+      id: string; crn: string; courseCode: string; title?: string; instructor: string;
       days: string; startTime: string; endTime: string;
       building?: string | null; room?: string | null; campus?: string | null;
       seatsAvailable: number; classSize: number; isAvailable: boolean;
     }> = []
 
+    // Helper to parse time like "09:00 am" to decimal hours
+    const parseTime = (timeStr: string): number => {
+      const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i)
+      if (!match) return 0
+      let hours = parseInt(match[1], 10)
+      const minutes = parseInt(match[2], 10)
+      const isPM = match[3].toLowerCase() === 'pm'
+      if (isPM && hours !== 12) hours += 12
+      if (!isPM && hours === 12) hours = 0
+      return hours + minutes / 60
+    }
+
     possibilities.possibilities.forEach(course => {
       course.sections.forEach(section => {
         if (!section.days || !section.start_time || !section.end_time || section.days === 'TBA') return
+
+        // Filter out sections outside calendar display range (7am-9pm)
+        const startHour = parseTime(section.start_time)
+        const endHour = parseTime(section.end_time)
+        if (startHour < 7 || endHour > 21) return
+
         blocks.push({
           id: `${course.course_code}-${section.crn}`,
+          crn: section.crn,
           courseCode: course.course_code,
           title: course.title || undefined,
           instructor: section.instructor || 'TBD',
@@ -964,10 +1056,43 @@ export default function PlanPage() {
       {/* Calendar Mode */}
       {viewMode === 'calendar' && (
         <div className="space-y-4">
+          {/* My Planned Sections */}
+          {plannedSections && plannedSections.sections.length > 0 && (
+            <div className="card bg-brand-50 border-brand-200">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-brand-900">My Schedule ({currentSemester})</h3>
+                <span className="text-sm text-brand-700">{plannedSections.sections.length} section{plannedSections.sections.length !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {plannedSections.sections.map(section => (
+                  <div
+                    key={section.id}
+                    className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-brand-200"
+                  >
+                    <div>
+                      <div className="font-medium text-sm">{section.course_code}</div>
+                      <div className="text-xs text-gray-500">{section.days} {section.start_time}</div>
+                    </div>
+                    <button
+                      onClick={() => removeFromPlanMutation.mutate(section.id)}
+                      className="text-gray-400 hover:text-red-500 ml-1"
+                      title="Remove from plan"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <p className="text-sm text-gray-500">
-            Showing all {scheduleBlocks.length} scheduled sections for your degree plan courses.
+            Showing all {scheduleBlocks.length} available sections. Click to add to your plan.
           </p>
-          <WeeklyCalendar scheduleBlocks={scheduleBlocks} />
+          <WeeklyCalendar
+            scheduleBlocks={scheduleBlocks}
+            onBlockClick={(block) => setSelectedSection(block)}
+          />
         </div>
       )}
 
@@ -1102,6 +1227,85 @@ export default function PlanPage() {
         isOpen={showCourseEntry}
         onClose={() => setShowCourseEntry(false)}
       />
+
+      {/* Section Details Modal */}
+      {selectedSection && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedSection(null)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{selectedSection.courseCode}</h3>
+                {selectedSection.title && (
+                  <p className="text-gray-600">{selectedSection.title}</p>
+                )}
+                <p className="text-sm text-gray-500">CRN: {selectedSection.crn}</p>
+              </div>
+              <button
+                onClick={() => setSelectedSection(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center gap-2 text-gray-700">
+                <Users className="h-4 w-4 text-gray-400" />
+                <span>{selectedSection.instructor}</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-700">
+                <Clock className="h-4 w-4 text-gray-400" />
+                <span>{selectedSection.days} · {selectedSection.startTime} - {selectedSection.endTime}</span>
+              </div>
+              {selectedSection.building && (
+                <div className="flex items-center gap-2 text-gray-700">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <span>{selectedSection.building}{selectedSection.room ? ` ${selectedSection.room}` : ''}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <div className={clsx(
+                  'px-2 py-1 rounded-full text-sm font-medium',
+                  selectedSection.seatsAvailable > 0
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-red-100 text-red-700'
+                )}>
+                  {selectedSection.seatsAvailable > 0
+                    ? `${selectedSection.seatsAvailable} seats available`
+                    : 'No seats available'}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              {isInPlan(selectedSection.crn) ? (
+                <button
+                  className="flex-1 btn bg-gray-100 text-gray-600 flex items-center justify-center gap-2 cursor-default"
+                  disabled
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Already in Plan
+                </button>
+              ) : (
+                <button
+                  onClick={() => addToPlanMutation.mutate(selectedSection)}
+                  disabled={addToPlanMutation.isPending}
+                  className="flex-1 btn btn-primary flex items-center justify-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  {addToPlanMutation.isPending ? 'Adding...' : 'Add to Plan'}
+                </button>
+              )}
+              <button
+                onClick={() => setSelectedSection(null)}
+                className="btn btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

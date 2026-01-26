@@ -467,6 +467,40 @@ export interface CompletedCoursesResponse {
   total: number
 }
 
+// Planned sections (semester schedule)
+export interface PlannedSection {
+  id: number
+  crn: string
+  course_code: string
+  course_title: string | null
+  instructor: string | null
+  days: string | null
+  start_time: string | null
+  end_time: string | null
+  building: string | null
+  room: string | null
+  semester: string
+  created_at: string
+}
+
+export interface PlannedSectionCreate {
+  crn: string
+  course_code: string
+  course_title?: string
+  instructor?: string
+  days?: string
+  start_time?: string
+  end_time?: string
+  building?: string
+  room?: string
+  semester: string
+}
+
+export interface PlannedSectionsResponse {
+  sections: PlannedSection[]
+  total: number
+}
+
 export interface TranscriptSummary {
   total_hours_attempted: number
   total_hours_earned: number
