@@ -1,5 +1,5 @@
 import { useState, createContext, useContext } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import OnboardingModal from './components/Onboarding'
 import ChatPanel from './components/ChatPanel'
@@ -55,7 +55,7 @@ function AppContent() {
     <OnboardingContext.Provider value={{ showOnboarding, openOnboarding, closeOnboarding, hasCompletedOnboarding }}>
       <Layout>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Navigate to="/plan" replace />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/planner" element={<PlannerPage />} />
           <Route path="/programs" element={<ProgramsPage />} />

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useAuth, useUser, SignInButton } from '@clerk/clerk-react'
 import {
   GraduationCap,
@@ -25,6 +25,8 @@ import {
   AlertCircle,
   ArrowRight,
   Plus,
+  Mail,
+  CheckCircle,
 } from 'lucide-react'
 import { usePlan } from '../context/PlanContext'
 import {
@@ -34,6 +36,7 @@ import {
   getCompletedCourses,
   getQuickProgress,
   setAuthToken,
+  joinWaitlist,
 } from '../lib/api'
 import type { EnrichedCourseInfo, EnrichedRequirement } from '../types'
 import { clsx } from 'clsx'
@@ -480,6 +483,18 @@ export default function PlanPage() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['major']))
   const [viewMode, setViewMode] = useState<'overview' | 'list' | 'calendar'>('overview')
   const [showCourseEntry, setShowCourseEntry] = useState(false)
+  const [waitlistEmail, setWaitlistEmail] = useState('')
+  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false)
+
+  // Waitlist mutation
+  const waitlistMutation = useMutation({
+    mutationFn: async (email: string) => {
+      return joinWaitlist(email)
+    },
+    onSuccess: () => {
+      setWaitlistSubmitted(true)
+    },
+  })
 
   useEffect(() => {
     if (isLoaded && isSignedIn && !hasPlan) {
@@ -552,7 +567,7 @@ export default function PlanPage() {
     )
   }
 
-  // Sign-in prompt
+  // Waitlist signup for non-signed-in users
   if (!isSignedIn) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
@@ -560,17 +575,67 @@ export default function PlanPage() {
           <GraduationCap className="h-10 w-10 text-white" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Your Degree Roadmap</h1>
-        <p className="text-gray-600 mb-8 max-w-md">
+        <p className="text-gray-600 mb-6 max-w-md">
           Get a personalized plan to graduation with real-time course availability,
           smart scheduling, and AI-powered recommendations.
         </p>
-        <SignInButton mode="modal">
-          <button className="btn btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-shadow">
-            Sign In to Get Started
-          </button>
-        </SignInButton>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-16 w-full max-w-3xl">
+        {/* Waitlist Form */}
+        {!waitlistSubmitted ? (
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+            <p className="text-gray-700 mb-4">
+              We're launching to a small group first. Join the waitlist and we'll reach out within 24 hours!
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (waitlistEmail.trim() && !waitlistMutation.isPending) {
+                  waitlistMutation.mutate(waitlistEmail.trim())
+                }
+              }}
+              className="flex gap-2"
+            >
+              <div className="relative flex-1">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={waitlistMutation.isPending}
+                className={clsx(
+                  'px-6 py-3 rounded-lg font-medium transition-colors',
+                  waitlistMutation.isPending
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    : 'bg-brand-600 text-white hover:bg-brand-700'
+                )}
+              >
+                {waitlistMutation.isPending ? 'Joining...' : 'Join Waitlist'}
+              </button>
+            </form>
+            {waitlistMutation.isError && (
+              <p className="text-red-500 text-sm mt-2">Something went wrong. Try again?</p>
+            )}
+          </div>
+        ) : (
+          <div className="w-full max-w-md bg-green-50 rounded-2xl border border-green-200 p-6 mb-8">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <CheckCircle className="h-6 w-6 text-green-600" />
+              <span className="text-green-800 font-semibold text-lg">You're on the list!</span>
+            </div>
+            <p className="text-green-700">
+              We'll reach out within 24 hours to help you plan your path to graduation.
+            </p>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-3 gap-6 w-full max-w-3xl">
           {[
             { icon: Target, title: 'Smart Planning', desc: 'AI suggests your optimal course path' },
             { icon: Calendar, title: 'Live Schedule', desc: 'Real-time seat availability' },

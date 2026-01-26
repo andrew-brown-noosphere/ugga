@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, Calendar, Home, Search, GraduationCap, Sparkles, Target, Users, User, Crown, Users2, Heart } from 'lucide-react'
+import { BookOpen, Calendar, Search, GraduationCap, Sparkles, Target, Users, User, Crown, Users2, Heart } from 'lucide-react'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import { clsx } from 'clsx'
 import { useSubscription } from '../context/SubscriptionContext'
@@ -9,11 +9,10 @@ interface LayoutProps {
 }
 
 const navigation = [
-  { name: 'Home', href: '/', icon: Home },
+  { name: 'My Plan', href: '/plan', icon: Target },
   { name: 'Programs', href: '/programs', icon: GraduationCap },
   { name: 'Courses', href: '/courses', icon: BookOpen },
   { name: 'Faculty', href: '/instructors', icon: Users },
-  { name: 'My Plan', href: '/plan', icon: Target },
   { name: 'Planner', href: '/planner', icon: Calendar },
   { name: 'Study Groups', href: '/study-groups', icon: Users2 },
   { name: 'Cohorts', href: '/cohorts', icon: Heart },
