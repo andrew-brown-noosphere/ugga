@@ -735,7 +735,8 @@ async def scrape_all_programs(
         List of ScrapedProgram objects
     """
     if program_types is None:
-        program_types = ["UG"]  # Default to undergraduate
+        # All program types: Undergraduate, Graduate, Minors, Certificates, Professional
+        program_types = ["UG", "GM", "MINOR", "CERT-UG", "CERT-GM", "PR"]
 
     async with BulletinScraper() as scraper:
         # Search for programs
