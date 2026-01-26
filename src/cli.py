@@ -321,6 +321,75 @@ def parse_prerequisites(args):
     print(f"Errors: {stats['errors']}")
 
 
+def scrape_all_programs(args):
+    """Scrape all programs from the programs list file."""
+    import asyncio
+    from pathlib import Path
+
+    async def _scrape():
+        from src.services.bulletin_scraper import BulletinScraper
+
+        # Read programs list
+        programs_file = Path("data/programs_list.txt")
+        if not programs_file.exists():
+            print(f"Error: {programs_file} not found")
+            sys.exit(1)
+
+        programs_to_scrape = []
+        with open(programs_file) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                # Format: TYPE|DEGREE|BULLETIN_ID|COLLEGE_CODE
+                parts = line.split("|")
+                if len(parts) >= 4:
+                    prog_type, degree, bulletin_id, college_code = parts[:4]
+                    # Filter by type if specified
+                    if args.types and prog_type not in args.types.split(","):
+                        continue
+                    programs_to_scrape.append((bulletin_id, college_code, prog_type, degree))
+
+        print(f"Found {len(programs_to_scrape)} programs to scrape")
+
+        if args.limit:
+            programs_to_scrape = programs_to_scrape[:args.limit]
+            print(f"Limited to {args.limit} programs")
+
+        async with BulletinScraper(skip_db=not args.save) as scraper:
+            success = 0
+            failed = 0
+
+            for i, (bulletin_id, college_code, prog_type, degree) in enumerate(programs_to_scrape):
+                print(f"\n[{i+1}/{len(programs_to_scrape)}] Scraping {prog_type} {degree} ({bulletin_id}:{college_code})...")
+
+                try:
+                    program = await scraper.scrape_program(bulletin_id, college_code)
+
+                    if program:
+                        print(f"  -> {program.name}: {len(program.requirements)} requirements")
+                        if args.save:
+                            scraper.save_program(program)
+                            print(f"  -> Saved to database")
+                        success += 1
+                    else:
+                        print(f"  -> Failed to scrape")
+                        failed += 1
+
+                except Exception as e:
+                    print(f"  -> Error: {e}")
+                    failed += 1
+
+                # Be nice to the server
+                await asyncio.sleep(1)
+
+            print(f"\n=== Complete ===")
+            print(f"Success: {success}")
+            print(f"Failed: {failed}")
+
+    asyncio.run(_scrape())
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -388,6 +457,13 @@ def main():
     # Parse prerequisites command
     parse_parser = subparsers.add_parser("parse-prereqs", help="Parse prerequisites from bulletin courses")
     parse_parser.set_defaults(func=parse_prerequisites)
+
+    # Scrape all programs command
+    scrape_all_parser = subparsers.add_parser("scrape-programs", help="Scrape all programs from programs_list.txt")
+    scrape_all_parser.add_argument("-t", "--types", help="Filter by program types (e.g., UG,GM,MINOR)")
+    scrape_all_parser.add_argument("-l", "--limit", type=int, help="Limit number of programs to scrape")
+    scrape_all_parser.add_argument("--save", action="store_true", help="Save to database")
+    scrape_all_parser.set_defaults(func=scrape_all_programs)
 
     args = parser.parse_args()
 

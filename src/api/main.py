@@ -689,17 +689,25 @@ from src.api.schemas import (
 from src.models.database import Program, ProgramRequirement, RequirementCourse, BulletinCourse
 
 
-@app.get("/programs", response_model=list[ProgramListResponse], tags=["Programs"])
+@app.get("/programs", response_model=list[ProgramResponse], tags=["Programs"])
 async def list_programs(
     degree_type: Optional[str] = Query(None, description="Filter by degree type (BS, BA, etc.)"),
     search: Optional[str] = Query(None, description="Search in program name"),
     limit: int = Query(100, ge=1, le=500),
     service: CourseService = Depends(get_service),
 ):
-    """List all degree programs."""
+    """List all degree programs with requirements."""
     with service.session_factory() as session:
         from sqlalchemy import select
-        query = select(Program)
+        from sqlalchemy.orm import joinedload
+
+        query = (
+            select(Program)
+            .options(
+                joinedload(Program.requirements)
+                .joinedload(ProgramRequirement.courses)
+            )
+        )
 
         if degree_type:
             query = query.where(Program.degree_type == degree_type.upper())
@@ -707,16 +715,41 @@ async def list_programs(
             query = query.where(Program.name.ilike(f"%{search}%"))
 
         query = query.order_by(Program.name).limit(limit)
-        programs = session.execute(query).scalars().all()
+        programs = session.execute(query).unique().scalars().all()
 
         return [
-            ProgramListResponse(
+            ProgramResponse(
                 id=p.id,
+                bulletin_id=p.bulletin_id or "",
                 name=p.name,
                 degree_type=p.degree_type,
                 college_code=p.college_code,
                 department=p.department,
+                overview=p.overview,
                 total_hours=p.total_hours,
+                bulletin_url=p.bulletin_url or "",
+                requirements=[
+                    ProgramRequirementResponse(
+                        id=r.id,
+                        name=r.name,
+                        category=r.category,
+                        required_hours=r.required_hours,
+                        description=r.description,
+                        selection_type=r.selection_type or "all",
+                        courses_to_select=r.courses_to_select,
+                        courses=[
+                            RequirementCourseResponse(
+                                id=c.id,
+                                course_code=c.course_code,
+                                title=c.title,
+                                credit_hours=c.credit_hours,
+                                is_group=c.is_group or False,
+                            )
+                            for c in r.courses
+                        ],
+                    )
+                    for r in p.requirements
+                ],
             )
             for p in programs
         ]
