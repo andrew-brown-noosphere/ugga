@@ -66,3 +66,5 @@ frontend/.env.local
 
 # Alembic
 alembic/versions/__pycache__/
+deploy.sh
+supabase_backup.dump
