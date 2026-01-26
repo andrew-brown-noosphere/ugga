@@ -454,4 +454,24 @@ export async function checkChatHealth(): Promise<{ status: string; model?: strin
   return data
 }
 
+// Waitlist
+export interface WaitlistResponse {
+  success: boolean
+  message: string
+}
+
+export async function joinWaitlist(email: string): Promise<WaitlistResponse> {
+  const { data } = await api.post('/waitlist', { email })
+  return data
+}
+
+export async function getWaitlistCount(): Promise<{
+  total: number
+  pending: number
+  spots_remaining: number
+}> {
+  const { data } = await api.get('/waitlist/count')
+  return data
+}
+
 export default api

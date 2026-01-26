@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from src.config import settings
 from src.models.database import (
-    Course, Document, BulletinCourse,
+    Course, Document, BulletinCourse, Program,
     get_engine, get_session_factory, init_db
 )
 
@@ -226,6 +226,44 @@ class EmbeddingService:
             logger.info(f"Embedded {len(courses)} bulletin courses")
 
             return len(courses)
+
+    def embed_programs(self, force: bool = False) -> int:
+        """
+        Generate embeddings for programs (degrees, minors, certificates).
+
+        Args:
+            force: Re-embed even if already has embedding
+
+        Returns:
+            Number of programs embedded
+        """
+        if not self._is_ready():
+            raise RuntimeError("Embedding client not initialized - check API keys")
+
+        with self.session_factory() as session:
+            query = select(Program)
+
+            if not force:
+                query = query.where(Program.embedding.is_(None))
+
+            programs = list(session.execute(query).scalars().all())
+
+            if not programs:
+                logger.info("No programs to embed")
+                return 0
+
+            logger.info(f"Embedding {len(programs)} programs...")
+
+            texts = [p.embedding_text for p in programs]
+            embeddings = self.generate_embeddings_batch(texts)
+
+            for program, embedding in zip(programs, embeddings):
+                program.embedding = embedding
+
+            session.commit()
+            logger.info(f"Embedded {len(programs)} programs")
+
+            return len(programs)
 
     def search_bulletin_courses(
         self,

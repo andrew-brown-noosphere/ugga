@@ -1254,6 +1254,42 @@ class CourseRequirementApplication(Base):
 
 
 # =============================================================================
+# Waitlist (Beta Access)
+# =============================================================================
+
+class Waitlist(Base):
+    """
+    Waitlist for beta access to the AI features.
+
+    Simple email collection with status tracking for manual onboarding.
+    """
+    __tablename__ = "waitlist"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
+
+    # Status: pending, contacted, onboarded, declined
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+
+    # Optional: capture what they asked
+    initial_question: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Tracking
+    source: Mapped[str] = mapped_column(String(50), default="chat")  # chat, landing, etc.
+
+    # Notes for manual onboarding
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    contacted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    onboarded_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    def __repr__(self) -> str:
+        return f"<Waitlist(email='{self.email}', status='{self.status}')>"
+
+
+# =============================================================================
 # Database Engine and Session Management
 # =============================================================================
 

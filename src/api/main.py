@@ -586,6 +586,84 @@ async def embed_courses(
 
 
 # =============================================================================
+# Waitlist Endpoints (Beta Access)
+# =============================================================================
+
+from pydantic import BaseModel as PydanticBaseModel
+from src.models.database import Waitlist
+
+
+class WaitlistRequest(PydanticBaseModel):
+    email: str
+
+
+class WaitlistResponse(PydanticBaseModel):
+    success: bool
+    message: str
+
+
+@app.post("/waitlist", response_model=WaitlistResponse, tags=["Waitlist"])
+async def join_waitlist(
+    request: WaitlistRequest,
+    service: CourseService = Depends(get_service),
+):
+    """
+    Join the waitlist for beta access.
+
+    Captures email for manual onboarding within 24 hours.
+    """
+    from sqlalchemy import select
+
+    with service.session_factory() as session:
+        # Check if already on waitlist
+        existing = session.execute(
+            select(Waitlist).where(Waitlist.email == request.email.lower())
+        ).scalar_one_or_none()
+
+        if existing:
+            return WaitlistResponse(
+                success=True,
+                message="You're already on the list! We'll reach out soon.",
+            )
+
+        # Add to waitlist
+        entry = Waitlist(
+            email=request.email.lower(),
+            status="pending",
+            source="chat",
+        )
+        session.add(entry)
+        session.commit()
+
+        return WaitlistResponse(
+            success=True,
+            message="You're on the list! We'll reach out within 24 hours.",
+        )
+
+
+@app.get("/waitlist/count", tags=["Waitlist"])
+async def get_waitlist_count(
+    service: CourseService = Depends(get_service),
+):
+    """Get current waitlist count (for display purposes)."""
+    from sqlalchemy import select, func
+
+    with service.session_factory() as session:
+        total = session.execute(
+            select(func.count(Waitlist.id))
+        ).scalar()
+        pending = session.execute(
+            select(func.count(Waitlist.id)).where(Waitlist.status == "pending")
+        ).scalar()
+
+        return {
+            "total": total,
+            "pending": pending,
+            "spots_remaining": max(0, 20 - total),
+        }
+
+
+# =============================================================================
 # Program Endpoints
 # =============================================================================
 
