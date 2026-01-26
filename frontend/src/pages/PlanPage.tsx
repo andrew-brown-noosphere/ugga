@@ -65,6 +65,12 @@ const GOAL_INFO: Record<string, { title: string; icon: React.ElementType; descri
     description: 'Keeping options open',
     color: 'from-blue-500 to-cyan-500',
   },
+  'minimal': {
+    title: 'Minimal Effort',
+    icon: Clock,
+    description: 'Path of least resistance',
+    color: 'from-pink-500 to-rose-500',
+  },
 }
 
 // Progress Ring Component
@@ -241,27 +247,67 @@ function CourseQuickCard({ course, showSchedule = false }: { course: CourseCardD
   )
 }
 
+// Generate semesters starting from current
+function generateSemesters(startYear: number, startSemester: 'Spring' | 'Summer' | 'Fall', count: number) {
+  const semesters: Array<{ label: string; key: string }> = []
+  let year = startYear
+  let sem = startSemester
+  const order: Array<'Spring' | 'Summer' | 'Fall'> = ['Spring', 'Summer', 'Fall']
+  let idx = order.indexOf(sem)
+
+  for (let i = 0; i < count; i++) {
+    const shortYear = year.toString().slice(-2)
+    const shortSem = sem === 'Spring' ? 'Spr' : sem === 'Summer' ? 'Sum' : 'Fall'
+    semesters.push({ label: `${shortSem} ${shortYear}`, key: `${sem}-${year}` })
+
+    idx++
+    if (idx >= order.length) {
+      idx = 0
+      year++
+    }
+    sem = order[idx]
+  }
+  return semesters
+}
+
+// Get current semester based on date
+function getCurrentSemester(): { year: number; semester: 'Spring' | 'Summer' | 'Fall' } {
+  const now = new Date()
+  const month = now.getMonth() + 1 // 1-12
+  const year = now.getFullYear()
+
+  if (month >= 1 && month <= 5) return { year, semester: 'Spring' }
+  if (month >= 6 && month <= 7) return { year, semester: 'Summer' }
+  return { year, semester: 'Fall' }
+}
+
 // Semester Timeline Item
 function SemesterBlock({
   semester,
-  courses,
+  hours,
   isComplete = false,
   isCurrent = false
 }: {
   semester: string
-  courses: number
+  hours: number
   isComplete?: boolean
   isCurrent?: boolean
 }) {
+  // Size based on hours: min 32px, max 48px
+  const size = Math.max(32, Math.min(48, 24 + hours * 1.5))
+
   return (
     <div className="flex flex-col items-center">
-      <div className={clsx(
-        'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all',
-        isComplete ? 'bg-emerald-500 text-white' :
-        isCurrent ? 'bg-brand-600 text-white ring-4 ring-brand-200' :
-        'bg-gray-200 text-gray-600'
-      )}>
-        {isComplete ? <CheckCircle2 className="h-5 w-5" /> : courses}
+      <div
+        className={clsx(
+          'rounded-full flex items-center justify-center text-sm font-medium transition-all',
+          isComplete ? 'bg-emerald-500 text-white' :
+          isCurrent ? 'bg-brand-600 text-white ring-4 ring-brand-200' :
+          'bg-gray-200 text-gray-600'
+        )}
+        style={{ width: size, height: size }}
+      >
+        {isComplete ? <CheckCircle2 className="h-5 w-5" /> : hours}
       </div>
       <span className={clsx(
         'text-[10px] mt-1 font-medium',
@@ -729,24 +775,43 @@ export default function PlanPage() {
           <Clock className="h-5 w-5 text-brand-600" />
           Your Path to Graduation
         </h3>
-        <div className="flex items-center justify-between overflow-x-auto pb-2">
-          <div className="flex items-center gap-2 min-w-max">
-            {['Fall 24', 'Spr 25', 'Sum 25', 'Fall 25', 'Spr 26', 'Sum 26', 'Fall 26', 'Spr 27'].map((sem, i) => (
-              <div key={sem} className="flex items-center">
-                <SemesterBlock
-                  semester={sem}
-                  courses={Math.floor(totalHours / 8 / 3)}
-                  isComplete={i < 0}
-                  isCurrent={i === 3}
-                />
-                {i < 7 && <div className="w-8 h-0.5 bg-gray-200 mx-1" />}
+        {(() => {
+          const current = getCurrentSemester()
+          const remainingHours = totalHours - completedHours
+          const hoursPerSemester = 15
+          const semestersNeeded = Math.ceil(remainingHours / hoursPerSemester)
+          const semesters = generateSemesters(current.year, current.semester, Math.min(semestersNeeded + 1, 10))
+          const graduationSem = semesters[semesters.length - 1]
+
+          return (
+            <>
+              <div className="flex items-center justify-between overflow-x-auto pb-2">
+                <div className="flex items-center gap-2 min-w-max">
+                  {semesters.map((sem, i) => {
+                    const isLast = i === semesters.length - 1
+                    const semHours = isLast
+                      ? remainingHours - (hoursPerSemester * (semesters.length - 1))
+                      : hoursPerSemester
+                    return (
+                      <div key={sem.key} className="flex items-center">
+                        <SemesterBlock
+                          semester={sem.label}
+                          hours={Math.max(0, Math.min(18, semHours))}
+                          isComplete={false}
+                          isCurrent={i === 0}
+                        />
+                        {i < semesters.length - 1 && <div className="w-8 h-0.5 bg-gray-200 mx-1" />}
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-        <p className="text-xs text-gray-500 mt-3">
-          Estimated graduation: Spring 2027 at 15 credits/semester
-        </p>
+              <p className="text-xs text-gray-500 mt-3">
+                Estimated graduation: {graduationSem?.label} at {hoursPerSemester} credits/semester
+              </p>
+            </>
+          )
+        })()}
       </div>
 
       {/* View Toggle */}

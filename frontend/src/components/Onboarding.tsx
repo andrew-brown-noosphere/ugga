@@ -11,6 +11,7 @@ import {
   BookOpen,
   Compass,
   X,
+  Coffee,
 } from 'lucide-react'
 import AIStreamingModal from './AIStreamingModal'
 
@@ -96,6 +97,12 @@ const GOALS = [
     title: 'Keep my options open',
     description: 'Balance requirements while exploring different paths',
     icon: BookOpen,
+  },
+  {
+    id: 'minimal',
+    title: 'Honestly, I just want to party',
+    description: "Let's make this as painless as possible",
+    icon: Coffee,
   },
 ]
 
