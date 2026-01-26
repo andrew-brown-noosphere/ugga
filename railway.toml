@@ -1,7 +1,6 @@
 [build]
 builder = "dockerfile"
 dockerfilePath = "Dockerfile"
-dockerBuildArgs = ["VITE_CLERK_PUBLISHABLE_KEY=${{VITE_CLERK_PUBLISHABLE_KEY}}"]
 
 [deploy]
 healthcheckPath = "/health"

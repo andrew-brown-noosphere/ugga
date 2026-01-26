@@ -2,13 +2,13 @@
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
-# Accept build args for Vite env vars
-ARG VITE_CLERK_PUBLISHABLE_KEY
-ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
-
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
+
+# Clerk publishable key (public - safe to include)
+RUN echo "VITE_CLERK_PUBLISHABLE_KEY=pk_test_aGFwcHktd2FscnVzLTUwLmNsZXJrLmFjY291bnRzLmRldiQ" > .env
+
 RUN npm run build
 
 # Stage 2: Python backend + serve frontend
