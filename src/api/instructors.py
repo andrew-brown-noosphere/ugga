@@ -160,7 +160,7 @@ async def get_instructor_syllabi(
     # Match syllabi by instructor name using raw SQL
     result = db.execute(
         text("""
-            SELECT id, course_code, course_title, semester, instructor_name, content
+            SELECT id, course_code, course_title, semester, instructor_name, content, syllabus_url
             FROM syllabi
             WHERE instructor_name ILIKE :name
             ORDER BY semester DESC
@@ -178,6 +178,7 @@ async def get_instructor_syllabi(
             semester=row[3],
             instructor_name=row[4],
             has_content=row[5] is not None and len(row[5]) > 0 if row[5] else False,
+            syllabus_url=row[6],
         )
         for row in rows
     ]

@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Search, User, Star, Mail, ChevronRight } from 'lucide-react'
+import { Search, User, Star, Mail, ChevronRight, ChevronLeft } from 'lucide-react'
 import { getProfessors } from '../lib/api'
+
+const PAGE_SIZE = 25
 
 export default function InstructorsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const initialSearch = searchParams.get('search') || ''
   const [search, setSearch] = useState(initialSearch)
   const [searchTerm, setSearchTerm] = useState(initialSearch)
+  const [page, setPage] = useState(0)
 
   // Update search when URL changes (e.g., from external link)
   useEffect(() => {
@@ -16,12 +19,17 @@ export default function InstructorsPage() {
     if (urlSearch !== searchTerm) {
       setSearch(urlSearch)
       setSearchTerm(urlSearch)
+      setPage(0) // Reset page on new search
     }
   }, [searchParams])
 
   const { data: professors, isLoading } = useQuery({
-    queryKey: ['professors', searchTerm],
-    queryFn: () => getProfessors({ search: searchTerm, limit: 50 }),
+    queryKey: ['professors', searchTerm, page],
+    queryFn: () => getProfessors({
+      search: searchTerm || undefined,
+      limit: PAGE_SIZE,
+      offset: page * PAGE_SIZE
+    }),
   })
 
   const handleSearch = (e: React.FormEvent) => {
@@ -81,10 +89,12 @@ export default function InstructorsPage() {
             <p className="text-gray-500">
               {searchTerm
                 ? 'No instructors found matching your search'
-                : 'Enter a name to search for faculty members'}
+                : 'No instructors found'}
             </p>
           </div>
         ) : (
+          <>
+
           professors?.map((prof) => (
             <Link
               key={prof.id}
@@ -134,7 +144,31 @@ export default function InstructorsPage() {
 
               <ChevronRight className="h-5 w-5 text-gray-400" />
             </Link>
-          ))
+          ))}
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between pt-4">
+            <button
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="btn btn-secondary flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </button>
+            <span className="text-sm text-gray-500">
+              Page {page + 1}
+            </span>
+            <button
+              onClick={() => setPage(p => p + 1)}
+              disabled={professors && professors.length < PAGE_SIZE}
+              className="btn btn-secondary flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+          </>
         )}
       </div>
     </div>
