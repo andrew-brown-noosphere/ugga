@@ -107,9 +107,9 @@ app.include_router(profile_router)
 # Health & Info Endpoints
 # =============================================================================
 
-@app.get("/", tags=["Health"])
-async def root():
-    """API root - health check and basic info."""
+@app.get("/api", tags=["Health"])
+async def api_root():
+    """API root - basic info."""
     return {
         "name": "UGA Course Scheduler API",
         "version": "0.1.0",
