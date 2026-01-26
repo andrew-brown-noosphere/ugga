@@ -1484,7 +1484,8 @@ if STATIC_DIR.exists():
     async def serve_spa(full_path: str):
         """Serve the React SPA for all non-API routes."""
         # Don't serve index.html for API routes
-        if full_path.startswith("api/"):
+        api_prefixes = ("api/", "chat/", "health", "docs", "openapi.json", "courses", "programs", "instructors", "users", "sections", "search", "syllabi")
+        if full_path.startswith(api_prefixes):
             raise HTTPException(status_code=404, detail="Not found")
 
         # Serve static file if it exists
