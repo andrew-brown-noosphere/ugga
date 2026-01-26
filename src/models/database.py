@@ -1321,8 +1321,16 @@ def init_db(engine=None):
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         conn.commit()
 
-    # Create tables
-    Base.metadata.create_all(engine)
+    # Check if tables already exist (skip create_all for pooled connections)
+    with engine.connect() as conn:
+        result = conn.execute(text(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'courses')"
+        ))
+        tables_exist = result.scalar()
+
+    # Create tables only if they don't exist
+    if not tables_exist:
+        Base.metadata.create_all(engine)
 
     # Create vector similarity indexes
     with engine.connect() as conn:
@@ -1366,7 +1374,15 @@ async def init_async_db(engine=None):
 
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-        await conn.run_sync(Base.metadata.create_all)
+
+        # Check if tables already exist
+        result = await conn.execute(text(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'courses')"
+        ))
+        tables_exist = result.scalar()
+
+        if not tables_exist:
+            await conn.run_sync(Base.metadata.create_all)
 
         await conn.execute(text("""
             CREATE INDEX IF NOT EXISTS ix_courses_embedding
