@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select, func
 
 from src.api.auth import get_current_user, get_optional_user
-from src.models.database import User, get_session_factory
+from src.models.database import User, UserFollow, ProfileLike, get_session_factory
 
 router = APIRouter(prefix="/profile", tags=["profile"])
 
@@ -124,6 +124,7 @@ class UpdateVisibilityRequest(BaseModel):
 
 
 class PublicProfileResponse(BaseModel):
+    id: int
     username: str
     display_name: Optional[str]
     photo_url: Optional[str]
@@ -146,6 +147,9 @@ class PublicProfileResponse(BaseModel):
     # Meta
     is_verified: bool
     is_own_profile: bool
+    # Social interactions (for logged-in users)
+    is_following: bool = False
+    is_liked: bool = False
 
 
 # =============================================================================
@@ -413,10 +417,31 @@ async def get_public_profile(
 
         # Build response based on visibility settings
         response = {
+            "id": user.id,
             "username": user.username,
             "is_verified": user.uga_email_verified,
             "is_own_profile": is_own_profile,
+            "is_following": False,
+            "is_liked": False,
         }
+
+        # Check if current user is following/liked this profile
+        if current_user and not is_own_profile:
+            is_following = session.execute(
+                select(UserFollow).where(
+                    UserFollow.follower_id == current_user["id"],
+                    UserFollow.following_id == user.id
+                )
+            ).scalar_one_or_none()
+            response["is_following"] = is_following is not None
+
+            is_liked = session.execute(
+                select(ProfileLike).where(
+                    ProfileLike.user_id == current_user["id"],
+                    ProfileLike.target_user_id == user.id
+                )
+            ).scalar_one_or_none()
+            response["is_liked"] = is_liked is not None
 
         # Always show display name as a fallback
         if settings.get("show_full_name", True) or is_own_profile:

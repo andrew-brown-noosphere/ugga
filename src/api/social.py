@@ -20,7 +20,7 @@ from src.api.schemas import (
     ProfileLikeStats,
 )
 from src.models.database import (
-    User, Instructor, UserFollow, ProfileLike,
+    User, Instructor, UserFollow, ProfileLike, InstructorFollow,
     get_session_factory,
 )
 
@@ -430,3 +430,105 @@ async def get_instructor_like_stats(
             like_count=like_count,
             is_liked=is_liked,
         )
+
+
+# =============================================================================
+# Instructor Follow Endpoints
+# =============================================================================
+
+@router.post("/instructors/{instructor_id}/follow")
+async def follow_instructor(
+    instructor_id: int,
+    user: User = Depends(get_current_user),
+):
+    """Follow an instructor."""
+    require_verified(user)
+    session_factory = get_session_factory()
+
+    with session_factory() as session:
+        # Check instructor exists
+        instructor = session.get(Instructor, instructor_id)
+        if not instructor:
+            raise HTTPException(status_code=404, detail="Instructor not found")
+
+        # Check if already following
+        existing = session.execute(
+            select(InstructorFollow).where(
+                InstructorFollow.user_id == user.id,
+                InstructorFollow.instructor_id == instructor_id
+            )
+        ).scalar_one_or_none()
+
+        if existing:
+            return {"success": True, "message": "Already following this instructor"}
+
+        # Create follow
+        follow = InstructorFollow(
+            user_id=user.id,
+            instructor_id=instructor_id,
+        )
+        session.add(follow)
+        session.commit()
+
+        return {"success": True, "message": "Now following this instructor"}
+
+
+@router.delete("/instructors/{instructor_id}/follow")
+async def unfollow_instructor(
+    instructor_id: int,
+    user: User = Depends(get_current_user),
+):
+    """Unfollow an instructor."""
+    require_verified(user)
+    session_factory = get_session_factory()
+
+    with session_factory() as session:
+        follow = session.execute(
+            select(InstructorFollow).where(
+                InstructorFollow.user_id == user.id,
+                InstructorFollow.instructor_id == instructor_id
+            )
+        ).scalar_one_or_none()
+
+        if not follow:
+            return {"success": True, "message": "Not following this instructor"}
+
+        session.delete(follow)
+        session.commit()
+
+        return {"success": True, "message": "Unfollowed instructor"}
+
+
+@router.get("/instructors/{instructor_id}/follow-stats")
+async def get_instructor_follow_stats(
+    instructor_id: int,
+    user: Optional[User] = Depends(get_optional_user),
+):
+    """Get follower count for an instructor."""
+    session_factory = get_session_factory()
+
+    with session_factory() as session:
+        instructor = session.get(Instructor, instructor_id)
+        if not instructor:
+            raise HTTPException(status_code=404, detail="Instructor not found")
+
+        # Count followers
+        follower_count = session.execute(
+            select(func.count()).select_from(InstructorFollow)
+            .where(InstructorFollow.instructor_id == instructor_id)
+        ).scalar() or 0
+
+        # Check if current user is following
+        is_following = False
+        if user:
+            is_following = session.execute(
+                select(InstructorFollow).where(
+                    InstructorFollow.user_id == user.id,
+                    InstructorFollow.instructor_id == instructor_id
+                )
+            ).scalar_one_or_none() is not None
+
+        return {
+            "follower_count": follower_count,
+            "is_following": is_following,
+        }

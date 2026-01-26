@@ -1468,6 +1468,30 @@ class ProfileLike(Base):
     )
 
     def __repr__(self) -> str:
+        return f"<ProfileLike(user={self.user_id}, target_user={self.target_user_id}, target_instructor={self.target_instructor_id})>"
+
+
+class InstructorFollow(Base):
+    """User follows an instructor."""
+    __tablename__ = "instructor_follows"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    instructor_id: Mapped[int] = mapped_column(ForeignKey("instructors.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User")
+    instructor: Mapped["Instructor"] = relationship("Instructor")
+
+    __table_args__ = (
+        Index("ix_instructor_follow_unique", "user_id", "instructor_id", unique=True),
+    )
+
+    def __repr__(self) -> str:
+        return f"<InstructorFollow(user={self.user_id}, instructor={self.instructor_id})>"
+
+    def __repr__(self) -> str:
         target = f"user={self.target_user_id}" if self.target_user_id else f"instructor={self.target_instructor_id}"
         return f"<ProfileLike(user={self.user_id}, {target})>"
 

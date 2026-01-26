@@ -641,6 +641,27 @@ async def join_waitlist(
         session.add(entry)
         session.commit()
 
+        # Send Slack notification
+        from src.config import settings
+        if settings.slack_webhook_url:
+            import httpx
+            try:
+                # Get waitlist count
+                from sqlalchemy import func
+                total = session.execute(
+                    select(func.count(Waitlist.id))
+                ).scalar()
+
+                httpx.post(
+                    settings.slack_webhook_url,
+                    json={
+                        "text": f"🎉 New waitlist signup!\n*Email:* {request.email.lower()}\n*Total signups:* {total}"
+                    },
+                    timeout=5.0,
+                )
+            except Exception:
+                pass  # Don't fail the request if Slack fails
+
         return WaitlistResponse(
             success=True,
             message="You're on the list! We'll reach out within 24 hours.",

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, Calendar, Home, Search, GraduationCap, Sparkles, Target, Users, User, Crown } from 'lucide-react'
+import { BookOpen, Calendar, Home, Search, GraduationCap, Sparkles, Target, Users, User, Crown, Users2, Heart } from 'lucide-react'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
 import { clsx } from 'clsx'
 import { useSubscription } from '../context/SubscriptionContext'
@@ -10,11 +10,13 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
-  { name: 'My Plan', href: '/plan', icon: Target },
-  { name: 'Courses', href: '/courses', icon: BookOpen },
-  { name: 'Planner', href: '/planner', icon: Calendar },
   { name: 'Programs', href: '/programs', icon: GraduationCap },
+  { name: 'Courses', href: '/courses', icon: BookOpen },
   { name: 'Faculty', href: '/instructors', icon: Users },
+  { name: 'My Plan', href: '/plan', icon: Target },
+  { name: 'Planner', href: '/planner', icon: Calendar },
+  { name: 'Study Groups', href: '/study-groups', icon: Users2 },
+  { name: 'Cohorts', href: '/cohorts', icon: Heart },
 ]
 
 export default function Layout({ children }: LayoutProps) {
@@ -32,7 +34,7 @@ export default function Layout({ children }: LayoutProps) {
               <div className="flex items-center justify-center w-9 h-9 bg-white/20 rounded-lg">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
-              <span className="text-white text-xl font-bold tracking-tight">UGA Planner</span>
+              <span className="text-white text-xl font-bold tracking-tight">GradPath</span>
             </Link>
 
             {/* Navigation */}
@@ -143,7 +145,7 @@ export default function Layout({ children }: LayoutProps) {
       <footer className="bg-white border-t mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-gray-500 text-sm">
-            UGA Planner - Smart Course Planning
+            GradPath - Smart Course Planning
           </p>
           <p className="text-center text-gray-400 text-xs mt-1">
             Not affiliated with the University of Georgia. Always consult your academic advisor.

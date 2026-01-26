@@ -631,6 +631,7 @@ export interface VisibilitySettings {
 }
 
 export interface PublicProfile {
+  id: number
   username: string
   display_name: string | null
   photo_url: string | null
@@ -650,6 +651,8 @@ export interface PublicProfile {
   bluesky_url: string | null
   is_verified: boolean
   is_own_profile: boolean
+  is_following: boolean
+  is_liked: boolean
 }
 
 export interface ProfileSearchResult {

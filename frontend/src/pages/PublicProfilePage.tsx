@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { useAuth } from '@clerk/clerk-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuth, SignInButton } from '@clerk/clerk-react'
 import {
   User,
   GraduationCap,
@@ -11,12 +11,17 @@ import {
   Shield,
   ArrowLeft,
   Lock,
+  ThumbsUp,
+  UserPlus,
+  UserCheck,
 } from 'lucide-react'
-import { getPublicProfile, setAuthToken } from '../lib/api'
+import { getPublicProfile, setAuthToken, followUser, unfollowUser, likeUser, unlikeUser, getFollowStats, getUserLikeStats } from '../lib/api'
+import { clsx } from 'clsx'
 
 export default function PublicProfilePage() {
   const { username } = useParams<{ username: string }>()
   const { getToken, isSignedIn } = useAuth()
+  const queryClient = useQueryClient()
 
   const {
     data: profile,
@@ -32,6 +37,51 @@ export default function PublicProfilePage() {
       return getPublicProfile(username!)
     },
     enabled: !!username,
+  })
+
+  // Get follow/like stats
+  const { data: followStats } = useQuery({
+    queryKey: ['followStats', profile?.id],
+    queryFn: () => getFollowStats(profile!.id),
+    enabled: !!profile?.id,
+  })
+
+  const { data: likeStats } = useQuery({
+    queryKey: ['likeStats', profile?.id],
+    queryFn: () => getUserLikeStats(profile!.id),
+    enabled: !!profile?.id,
+  })
+
+  // Follow mutation
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken()
+      setAuthToken(token)
+      if (profile?.is_following) {
+        return unfollowUser(profile.id)
+      }
+      return followUser(profile!.id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['publicProfile', username] })
+      queryClient.invalidateQueries({ queryKey: ['followStats', profile?.id] })
+    },
+  })
+
+  // Like mutation
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken()
+      setAuthToken(token)
+      if (profile?.is_liked) {
+        return unlikeUser(profile.id)
+      }
+      return likeUser(profile!.id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['publicProfile', username] })
+      queryClient.invalidateQueries({ queryKey: ['likeStats', profile?.id] })
+    },
   })
 
   if (isLoading) {
@@ -117,6 +167,58 @@ export default function PublicProfilePage() {
                 Edit your profile
                 <ExternalLink className="h-3 w-3" />
               </Link>
+            )}
+
+            {/* Like/Follow buttons for other profiles */}
+            {!profile.is_own_profile && (
+              <div className="flex items-center gap-2 mt-3">
+                {isSignedIn ? (
+                  <>
+                    <button
+                      onClick={() => likeMutation.mutate()}
+                      disabled={likeMutation.isPending}
+                      className={clsx(
+                        'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                        profile.is_liked
+                          ? 'bg-brand-100 text-brand-700 hover:bg-brand-200'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      )}
+                    >
+                      <ThumbsUp className={clsx('h-4 w-4', profile.is_liked && 'fill-current')} />
+                      {likeStats?.total_likes || 0}
+                    </button>
+                    <button
+                      onClick={() => followMutation.mutate()}
+                      disabled={followMutation.isPending}
+                      className={clsx(
+                        'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                        profile.is_following
+                          ? 'bg-brand-600 text-white hover:bg-brand-700'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      )}
+                    >
+                      {profile.is_following ? (
+                        <>
+                          <UserCheck className="h-4 w-4" />
+                          Following
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="h-4 w-4" />
+                          Follow
+                        </>
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  <SignInButton mode="modal">
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200">
+                      <UserPlus className="h-4 w-4" />
+                      Sign in to follow
+                    </button>
+                  </SignInButton>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -318,7 +420,7 @@ export default function PublicProfilePage() {
         <p>
           Powered by{' '}
           <Link to="/" className="text-brand-600 hover:text-brand-800">
-            UGA Course Scheduler
+            GradPath
           </Link>
         </p>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   User,
   Mail,
@@ -15,15 +15,19 @@ import {
   ExternalLink,
   AlertCircle,
   CheckCircle,
+  ThumbsUp,
+  UserPlus,
+  UserCheck,
 } from 'lucide-react'
-import { getProfessor, getProfessorCourses, getProfessorSyllabi, claimProfile } from '../lib/api'
-import { useAuth } from '@clerk/clerk-react'
+import { getProfessor, getProfessorCourses, getProfessorSyllabi, claimProfile, likeInstructor, unlikeInstructor, getInstructorLikeStats, followInstructor, unfollowInstructor, getInstructorFollowStats, setAuthToken } from '../lib/api'
+import { useAuth, SignInButton } from '@clerk/clerk-react'
 import { clsx } from 'clsx'
 
 export default function InstructorPage() {
   const { id } = useParams<{ id: string }>()
   const professorId = parseInt(id || '0')
-  const { isSignedIn } = useAuth()
+  const { isSignedIn, getToken } = useAuth()
+  const queryClient = useQueryClient()
   const [showClaimModal, setShowClaimModal] = useState(false)
   const [claimEmail, setClaimEmail] = useState('')
   const [claimError, setClaimError] = useState('')
@@ -34,6 +38,50 @@ export default function InstructorPage() {
     queryKey: ['professor', professorId],
     queryFn: () => getProfessor(professorId),
     enabled: professorId > 0,
+  })
+
+  // Get like stats
+  const { data: likeStats } = useQuery({
+    queryKey: ['instructorLikeStats', professorId],
+    queryFn: () => getInstructorLikeStats(professorId),
+    enabled: professorId > 0,
+  })
+
+  // Like mutation
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken()
+      setAuthToken(token)
+      if (likeStats?.user_has_liked) {
+        return unlikeInstructor(professorId)
+      }
+      return likeInstructor(professorId)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructorLikeStats', professorId] })
+    },
+  })
+
+  // Get follow stats
+  const { data: followStats } = useQuery({
+    queryKey: ['instructorFollowStats', professorId],
+    queryFn: () => getInstructorFollowStats(professorId),
+    enabled: professorId > 0,
+  })
+
+  // Follow mutation
+  const followMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getToken()
+      setAuthToken(token)
+      if (followStats?.is_following) {
+        return unfollowInstructor(professorId)
+      }
+      return followInstructor(professorId)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['instructorFollowStats', professorId] })
+    },
   })
 
   const { data: courses } = useQuery({
@@ -129,23 +177,75 @@ export default function InstructorPage() {
                 )}
               </div>
 
-              {/* RMP Rating */}
-              {professor.rmp_rating && (
-                <div className="text-center">
-                  <div className="flex items-center gap-1 text-lg font-semibold">
-                    <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    <span>{professor.rmp_rating.toFixed(1)}</span>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {professor.rmp_num_ratings} ratings
-                  </p>
-                  {professor.rmp_difficulty && (
-                    <p className="text-xs text-gray-500">
-                      {professor.rmp_difficulty.toFixed(1)} difficulty
-                    </p>
+              <div className="flex items-start gap-4">
+                {/* Like & Follow buttons */}
+                <div className="flex items-center gap-2">
+                  {isSignedIn ? (
+                    <>
+                      <button
+                        onClick={() => likeMutation.mutate()}
+                        disabled={likeMutation.isPending}
+                        className={clsx(
+                          'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                          likeStats?.user_has_liked
+                            ? 'bg-brand-100 text-brand-700 hover:bg-brand-200'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        )}
+                      >
+                        <ThumbsUp className={clsx('h-4 w-4', likeStats?.user_has_liked && 'fill-current')} />
+                        {likeStats?.total_likes || 0}
+                      </button>
+                      <button
+                        onClick={() => followMutation.mutate()}
+                        disabled={followMutation.isPending}
+                        className={clsx(
+                          'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                          followStats?.is_following
+                            ? 'bg-brand-600 text-white hover:bg-brand-700'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        )}
+                      >
+                        {followStats?.is_following ? (
+                          <>
+                            <UserCheck className="h-4 w-4" />
+                            Following
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="h-4 w-4" />
+                            Follow
+                          </>
+                        )}
+                      </button>
+                    </>
+                  ) : (
+                    <SignInButton mode="modal">
+                      <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200">
+                        <ThumbsUp className="h-4 w-4" />
+                        {likeStats?.total_likes || 0}
+                      </button>
+                    </SignInButton>
                   )}
                 </div>
-              )}
+
+                {/* RMP Rating */}
+                {professor.rmp_rating && (
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 text-lg font-semibold">
+                      <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                      <span>{professor.rmp_rating.toFixed(1)}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {professor.rmp_num_ratings} ratings
+                    </p>
+                    {professor.rmp_difficulty && (
+                      <p className="text-xs text-gray-500">
+                        {professor.rmp_difficulty.toFixed(1)} difficulty
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Contact Info */}

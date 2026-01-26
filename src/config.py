@@ -76,6 +76,9 @@ class Settings(BaseSettings):
     # Frontend URL for redirects
     frontend_url: str = "http://localhost:5173"
 
+    # Notifications
+    slack_webhook_url: Optional[str] = None
+
 
 @lru_cache
 def get_settings() -> Settings:

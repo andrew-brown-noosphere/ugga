@@ -46,9 +46,14 @@ async def send_message(
     The AI uses RAG to search courses, syllabi, and program data
     to provide grounded responses about UGA academics.
 
-    Authentication is optional - unauthenticated users can still chat
-    but may have rate limits applied.
+    Currently disabled - users must join waitlist first.
     """
+    # Disabled until launch - all users go through waitlist
+    raise HTTPException(
+        status_code=503,
+        detail="AI chat is currently in private beta. Join the waitlist for access!"
+    )
+
     try:
         chat_service = get_chat_service()
 

@@ -665,4 +665,20 @@ export async function getInstructorLikeStats(instructorId: number): Promise<Prof
   return data
 }
 
+// Instructor follow
+export async function followInstructor(instructorId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.post(`/social/instructors/${instructorId}/follow`)
+  return data
+}
+
+export async function unfollowInstructor(instructorId: number): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.delete(`/social/instructors/${instructorId}/follow`)
+  return data
+}
+
+export async function getInstructorFollowStats(instructorId: number): Promise<{ follower_count: number; is_following: boolean }> {
+  const { data } = await api.get(`/social/instructors/${instructorId}/follow-stats`)
+  return data
+}
+
 export default api
