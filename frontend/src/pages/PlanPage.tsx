@@ -487,55 +487,7 @@ export default function PlanPage() {
     }
   }, [hasPlan, navigate, isLoaded, isSignedIn])
 
-  // Show loading
-  if (!isLoaded) {
-    return (
-      <div className="space-y-6">
-        <div className="h-48 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl animate-pulse" />
-        <div className="grid md:grid-cols-3 gap-4">
-          {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse" />)}
-        </div>
-      </div>
-    )
-  }
-
-  // Sign-in prompt
-  if (!isSignedIn) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <div className="w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-          <GraduationCap className="h-10 w-10 text-white" />
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Your Degree Roadmap</h1>
-        <p className="text-gray-600 mb-8 max-w-md">
-          Get a personalized plan to graduation with real-time course availability,
-          smart scheduling, and AI-powered recommendations.
-        </p>
-        <SignInButton mode="modal">
-          <button className="btn btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-shadow">
-            Sign In to Get Started
-          </button>
-        </SignInButton>
-
-        <div className="grid md:grid-cols-3 gap-6 mt-16 w-full max-w-3xl">
-          {[
-            { icon: Target, title: 'Smart Planning', desc: 'AI suggests your optimal course path' },
-            { icon: Calendar, title: 'Live Schedule', desc: 'Real-time seat availability' },
-            { icon: Sparkles, title: 'Insights', desc: 'Know which courses fill fast' },
-          ].map((item, i) => (
-            <div key={i} className="text-center">
-              <div className="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <item.icon className="h-6 w-6 text-brand-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900">{item.title}</h3>
-              <p className="text-sm text-gray-500">{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   // Progress data queries
   const { data: quickProgress } = useQuery({
     queryKey: ['quickProgress'],
@@ -586,6 +538,56 @@ export default function PlanPage() {
       : Promise.resolve(null)),
     enabled: !!basicProgram?.id,
   })
+
+  // CONDITIONAL RETURNS - after all hooks
+  // Show loading
+  if (!isLoaded) {
+    return (
+      <div className="space-y-6">
+        <div className="h-48 bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl animate-pulse" />
+        <div className="grid md:grid-cols-3 gap-4">
+          {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-200 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    )
+  }
+
+  // Sign-in prompt
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+        <div className="w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+          <GraduationCap className="h-10 w-10 text-white" />
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Your Degree Roadmap</h1>
+        <p className="text-gray-600 mb-8 max-w-md">
+          Get a personalized plan to graduation with real-time course availability,
+          smart scheduling, and AI-powered recommendations.
+        </p>
+        <SignInButton mode="modal">
+          <button className="btn btn-primary text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-shadow">
+            Sign In to Get Started
+          </button>
+        </SignInButton>
+
+        <div className="grid md:grid-cols-3 gap-6 mt-16 w-full max-w-3xl">
+          {[
+            { icon: Target, title: 'Smart Planning', desc: 'AI suggests your optimal course path' },
+            { icon: Calendar, title: 'Live Schedule', desc: 'Real-time seat availability' },
+            { icon: Sparkles, title: 'Insights', desc: 'Know which courses fill fast' },
+          ].map((item, i) => (
+            <div key={i} className="text-center">
+              <div className="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <item.icon className="h-6 w-6 text-brand-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">{item.title}</h3>
+              <p className="text-sm text-gray-500">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (!plan) return null
 
