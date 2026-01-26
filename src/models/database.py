@@ -1490,6 +1490,8 @@ def get_engine(url: Optional[str] = None):
             url or settings.database_url,
             pool_size=settings.database_pool_size,
             max_overflow=settings.database_max_overflow,
+            pool_pre_ping=True,  # Check connections before use (handles Neon disconnects)
+            pool_recycle=300,  # Recycle connections every 5 minutes
             echo=settings.debug,
         )
     return _engine
@@ -1503,6 +1505,8 @@ def get_async_engine(url: Optional[str] = None):
             url or settings.async_database_url,
             pool_size=settings.database_pool_size,
             max_overflow=settings.database_max_overflow,
+            pool_pre_ping=True,  # Check connections before use (handles Neon disconnects)
+            pool_recycle=300,  # Recycle connections every 5 minutes
             echo=settings.debug,
         )
     return _async_engine
