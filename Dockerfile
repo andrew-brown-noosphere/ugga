@@ -1,6 +1,11 @@
 # Stage 1: Build frontend
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
+
+# Accept build args for Vite env vars
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
