@@ -4,6 +4,9 @@ WORKDIR /app/frontend
 
 COPY frontend/package*.json ./
 RUN npm ci
+
+# Cache bust: update this date to force frontend rebuild
+ARG FRONTEND_CACHE_BUST=2026-01-26
 COPY frontend/ ./
 
 # Clerk publishable key (public - safe to include)
