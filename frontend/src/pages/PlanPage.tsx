@@ -756,7 +756,7 @@ export default function PlanPage() {
         )}
         <InsightCard
           icon={Sparkles}
-          title="Ask AI Advisor"
+          title="Ask AI Assistant"
           description="Get personalized course guidance"
           action={{ label: 'Start chat', onClick: () => navigate('/chat') }}
         />
@@ -1004,7 +1004,7 @@ export default function PlanPage() {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">
-              Ask AI Advisor
+              Ask AI Assistant
             </h3>
             <p className="text-sm text-gray-500">Get course recommendations</p>
           </div>

@@ -41,7 +41,7 @@ async def send_message(
     user: Optional[dict] = Depends(get_optional_user),
 ):
     """
-    Send a message to the AI academic advisor.
+    Send a message to the AI assistant.
 
     The AI uses RAG to search courses, syllabi, and program data
     to provide grounded responses about UGA academics.

@@ -496,7 +496,7 @@ async def chat_with_ai(
     user: Optional[dict] = Depends(get_optional_user),
 ):
     """
-    Chat with an AI academic advisor about UGA courses and programs.
+    Chat with an AI assistant about UGA courses and programs.
 
     The AI uses RAG (Retrieval Augmented Generation) to provide accurate,
     context-aware responses based on current course data, syllabi, and

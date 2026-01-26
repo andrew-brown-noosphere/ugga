@@ -28,7 +28,7 @@ class ChatResponse:
     model: str
 
 
-SYSTEM_PROMPT = """You are an AI academic advisor for the University of Georgia (UGA). You help students with:
+SYSTEM_PROMPT = """You are an AI assistant that helps students explore courses at the University of Georgia (UGA). You help with:
 - Finding courses that match their interests
 - Understanding degree requirements
 - Planning their academic schedule
