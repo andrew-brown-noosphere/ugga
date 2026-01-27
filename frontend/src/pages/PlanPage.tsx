@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import {
   GraduationCap,
@@ -480,6 +480,7 @@ function CourseDetailCard({ course }: { course: EnrichedCourseInfo }) {
 
 export default function PlanPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { isSignedIn, isLoaded, getToken } = useAuth()
   const { user } = useUser()
   const { plan, clearPlan, hasPlan } = usePlan()
@@ -517,7 +518,7 @@ export default function PlanPage() {
   })
 
   // Planned sections query
-  const { data: plannedSections, refetch: refetchPlanned } = useQuery({
+  const { data: plannedSections } = useQuery({
     queryKey: ['plannedSections', currentSemester],
     queryFn: async () => {
       const token = await getToken()
@@ -547,7 +548,7 @@ export default function PlanPage() {
       })
     },
     onSuccess: () => {
-      refetchPlanned()
+      queryClient.invalidateQueries({ queryKey: ['plannedSections'] })
       setSelectedSection(null)
     },
   })
@@ -560,14 +561,14 @@ export default function PlanPage() {
       return removePlannedSection(sectionId)
     },
     onSuccess: () => {
-      refetchPlanned()
+      queryClient.invalidateQueries({ queryKey: ['plannedSections'] })
     },
   })
 
-  // Check if a section is already in the plan
-  const isInPlan = (crn: string) => {
-    return plannedSections?.sections.some(s => s.crn === crn) || false
-  }
+  // Set of CRNs already in the plan (memoized)
+  const plannedCrns = useMemo(() => {
+    return new Set(plannedSections?.sections.map(s => s.crn) || [])
+  }, [plannedSections])
 
   useEffect(() => {
     if (isLoaded && isSignedIn && !hasPlan) {
@@ -1278,7 +1279,7 @@ export default function PlanPage() {
             </div>
 
             <div className="flex gap-3">
-              {isInPlan(selectedSection.crn) ? (
+              {plannedCrns.has(selectedSection.crn) ? (
                 <button
                   className="flex-1 btn bg-gray-100 text-gray-600 flex items-center justify-center gap-2 cursor-default"
                   disabled
