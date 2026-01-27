@@ -517,60 +517,21 @@ export default function PlanPage() {
     },
   })
 
-  // Planned sections query
-  const { data: plannedSections } = useQuery({
-    queryKey: ['plannedSections', currentSemester],
-    queryFn: async () => {
-      const token = await getToken()
-      setAuthToken(token)
-      return getPlannedSections(currentSemester)
-    },
-    enabled: isSignedIn,
-    retry: false,
-    staleTime: 30000,
-  })
+  // Planned sections - temporarily disabled for debugging
+  const plannedSections = { sections: [], total: 0 }
+  const plannedCrns = new Set<string>()
 
-  // Add to plan mutation
   const addToPlanMutation = useMutation({
-    mutationFn: async (section: typeof selectedSection) => {
-      if (!section) throw new Error('No section selected')
-      const token = await getToken()
-      setAuthToken(token)
-      return addPlannedSection({
-        crn: section.crn,
-        course_code: section.courseCode,
-        course_title: section.title,
-        instructor: section.instructor,
-        days: section.days,
-        start_time: section.startTime,
-        end_time: section.endTime,
-        building: section.building || undefined,
-        room: section.room || undefined,
-        semester: currentSemester,
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plannedSections'] })
-      setSelectedSection(null)
+    mutationFn: async (_section: typeof selectedSection) => {
+      throw new Error('Planned sections temporarily disabled')
     },
   })
 
-  // Remove from plan mutation
   const removeFromPlanMutation = useMutation({
-    mutationFn: async (sectionId: number) => {
-      const token = await getToken()
-      setAuthToken(token)
-      return removePlannedSection(sectionId)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plannedSections'] })
+    mutationFn: async (_sectionId: number) => {
+      throw new Error('Planned sections temporarily disabled')
     },
   })
-
-  // Set of CRNs already in the plan (memoized)
-  const plannedCrns = useMemo(() => {
-    return new Set(plannedSections?.sections.map(s => s.crn) || [])
-  }, [plannedSections])
 
   useEffect(() => {
     if (isLoaded && isSignedIn && !hasPlan) {
