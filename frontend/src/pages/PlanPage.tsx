@@ -568,6 +568,58 @@ export default function PlanPage() {
     enabled: !!basicProgram?.id,
   })
 
+  // Schedule blocks for calendar - must be before conditional returns
+  const scheduleBlocks = useMemo(() => {
+    if (!possibilities?.possibilities) return []
+    const blocks: Array<{
+      id: string; crn: string; courseCode: string; title?: string; instructor: string;
+      days: string; startTime: string; endTime: string;
+      building?: string | null; room?: string | null; campus?: string | null;
+      seatsAvailable: number; classSize: number; isAvailable: boolean;
+    }> = []
+
+    // Helper to parse time like "09:00 am" to decimal hours
+    const parseTime = (timeStr: string): number => {
+      const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i)
+      if (!match) return 0
+      let hours = parseInt(match[1], 10)
+      const minutes = parseInt(match[2], 10)
+      const isPM = match[3].toLowerCase() === 'pm'
+      if (isPM && hours !== 12) hours += 12
+      if (!isPM && hours === 12) hours = 0
+      return hours + minutes / 60
+    }
+
+    possibilities.possibilities.forEach(course => {
+      course.sections.forEach(section => {
+        if (!section.days || !section.start_time || !section.end_time || section.days === 'TBA') return
+
+        // Filter out sections outside calendar display range (7am-9pm)
+        const startHour = parseTime(section.start_time)
+        const endHour = parseTime(section.end_time)
+        if (startHour < 7 || endHour > 21) return
+
+        blocks.push({
+          id: `${course.course_code}-${section.crn}`,
+          crn: section.crn,
+          courseCode: course.course_code,
+          title: course.title || undefined,
+          instructor: section.instructor || 'TBD',
+          days: section.days,
+          startTime: section.start_time,
+          endTime: section.end_time,
+          building: section.building,
+          room: section.room,
+          campus: null,
+          seatsAvailable: section.seats_available,
+          classSize: section.class_size,
+          isAvailable: section.seats_available > 0,
+        })
+      })
+    })
+    return blocks
+  }, [possibilities])
+
   // CONDITIONAL RETURNS - after all hooks
   // Show loading
   if (!isLoaded) {
@@ -741,58 +793,6 @@ export default function PlanPage() {
     other: 'Other',
   }
   const categoryOrder = ['major', 'core', 'foundation', 'gen_ed', 'elective', 'other']
-
-  // Schedule blocks for calendar - now uses filtered possibilities
-  const scheduleBlocks = useMemo(() => {
-    if (!possibilities?.possibilities) return []
-    const blocks: Array<{
-      id: string; crn: string; courseCode: string; title?: string; instructor: string;
-      days: string; startTime: string; endTime: string;
-      building?: string | null; room?: string | null; campus?: string | null;
-      seatsAvailable: number; classSize: number; isAvailable: boolean;
-    }> = []
-
-    // Helper to parse time like "09:00 am" to decimal hours
-    const parseTime = (timeStr: string): number => {
-      const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(am|pm)/i)
-      if (!match) return 0
-      let hours = parseInt(match[1], 10)
-      const minutes = parseInt(match[2], 10)
-      const isPM = match[3].toLowerCase() === 'pm'
-      if (isPM && hours !== 12) hours += 12
-      if (!isPM && hours === 12) hours = 0
-      return hours + minutes / 60
-    }
-
-    possibilities.possibilities.forEach(course => {
-      course.sections.forEach(section => {
-        if (!section.days || !section.start_time || !section.end_time || section.days === 'TBA') return
-
-        // Filter out sections outside calendar display range (7am-9pm)
-        const startHour = parseTime(section.start_time)
-        const endHour = parseTime(section.end_time)
-        if (startHour < 7 || endHour > 21) return
-
-        blocks.push({
-          id: `${course.course_code}-${section.crn}`,
-          crn: section.crn,
-          courseCode: course.course_code,
-          title: course.title || undefined,
-          instructor: section.instructor || 'TBD',
-          days: section.days,
-          startTime: section.start_time,
-          endTime: section.end_time,
-          building: section.building,
-          room: section.room,
-          campus: null,
-          seatsAvailable: section.seats_available,
-          classSize: section.class_size,
-          isAvailable: section.seats_available > 0,
-        })
-      })
-    })
-    return blocks
-  }, [possibilities])
 
   return (
     <div className="space-y-6 pb-8">
