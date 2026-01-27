@@ -110,8 +110,8 @@ function ProgressRing({ progress, size = 120, strokeWidth = 8 }: { progress: num
         />
         <defs>
           <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ba0c2f" />
-            <stop offset="100%" stopColor="#e63946" />
+            <stop offset="0%" stopColor="#b45309" />
+            <stop offset="100%" stopColor="#d97706" />
           </linearGradient>
         </defs>
       </svg>
@@ -586,20 +586,28 @@ export default function PlanPage() {
   if (!isSignedIn) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
-        <div className="w-20 h-20 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-          <GraduationCap className="h-10 w-10 text-white" />
+        {/* Hero Logo */}
+        <div className="w-20 h-20 bg-amber-100 border-2 border-amber-200 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+          <Compass className="h-10 w-10 text-amber-700" />
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Your Degree Roadmap</h1>
-        <p className="text-gray-600 mb-6 max-w-md">
-          Get a personalized plan to graduation with real-time course availability,
-          smart scheduling, and AI-powered recommendations.
+
+        {/* Headlines */}
+        <h1 className="text-4xl md:text-5xl font-bold text-amber-950 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+          Find Your Path
+        </h1>
+        <p className="text-xl text-green-700 font-medium mb-4">
+          Smart course planning, made locally
+        </p>
+        <p className="text-gray-600 mb-8 max-w-lg leading-relaxed">
+          We've done the homework on every course, professor, and syllabus — so you can focus on what matters.
+          Tell us your goals, we'll map your journey.
         </p>
 
         {/* Waitlist Form */}
         {!waitlistSubmitted ? (
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
-            <p className="text-gray-700 mb-4">
-              We're launching to a small group first. Join the waitlist and we'll reach out within 24 hours!
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-amber-100 p-6 mb-10">
+            <p className="text-amber-900 mb-4 font-medium">
+              Grab a spot — we'll be in touch soon!
             </p>
             <form
               onSubmit={(e) => {
@@ -608,30 +616,30 @@ export default function PlanPage() {
                   waitlistMutation.mutate(waitlistEmail.trim())
                 }
               }}
-              className="flex gap-2"
+              className="flex flex-col sm:flex-row gap-3"
             >
               <div className="relative flex-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-400" />
                 <input
                   type="email"
                   required
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                  placeholder="your.email@uga.edu"
+                  className="w-full pl-10 pr-4 py-3 border border-amber-200 rounded-xl bg-amber-50/50 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 focus:bg-white transition-all"
                 />
               </div>
               <button
                 type="submit"
                 disabled={waitlistMutation.isPending}
                 className={clsx(
-                  'px-6 py-3 rounded-lg font-medium transition-colors',
+                  'px-6 py-3 rounded-xl font-medium transition-all shadow-md',
                   waitlistMutation.isPending
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-brand-600 text-white hover:bg-brand-700'
+                    ? 'bg-amber-200 text-amber-500 cursor-not-allowed'
+                    : 'bg-amber-700 text-white hover:bg-amber-800 hover:shadow-lg'
                 )}
               >
-                {waitlistMutation.isPending ? 'Joining...' : 'Join Waitlist'}
+                {waitlistMutation.isPending ? 'Joining...' : 'Get Early Access'}
               </button>
             </form>
             {waitlistMutation.isError && (
@@ -639,32 +647,53 @@ export default function PlanPage() {
             )}
           </div>
         ) : (
-          <div className="w-full max-w-md bg-green-50 rounded-2xl border border-green-200 p-6 mb-8">
+          <div className="w-full max-w-md bg-green-50 rounded-2xl border border-green-200 p-6 mb-10">
             <div className="flex items-center justify-center gap-2 mb-2">
               <CheckCircle className="h-6 w-6 text-green-600" />
               <span className="text-green-800 font-semibold text-lg">You're on the list!</span>
             </div>
             <p className="text-green-700">
-              We'll reach out within 24 hours to help you plan your path to graduation.
+              We'll reach out within 24 hours to help you plan your path.
             </p>
           </div>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6 w-full max-w-3xl">
+        {/* Value Props - Athens indie style */}
+        <div className="grid md:grid-cols-3 gap-6 w-full max-w-4xl mb-12">
           {[
-            { icon: Target, title: 'Smart Planning', desc: 'AI suggests your optimal course path' },
-            { icon: Calendar, title: 'Live Schedule', desc: 'Real-time seat availability' },
-            { icon: Sparkles, title: 'Insights', desc: 'Know which courses fill fast' },
+            {
+              icon: Sparkles,
+              title: 'Real Data, Real Insights',
+              desc: 'Every course, professor, and syllabus analyzed — actual information, not generic advice.',
+              color: 'bg-amber-100 text-amber-700'
+            },
+            {
+              icon: Compass,
+              title: 'Your Goals, Your Schedule',
+              desc: 'Fast-track graduation or explore broadly — we plan around what matters to you.',
+              color: 'bg-green-100 text-green-700'
+            },
+            {
+              icon: Users,
+              title: 'Better Together',
+              desc: 'Find study partners, sync schedules with friends, build your crew.',
+              color: 'bg-cyan-100 text-cyan-700'
+            },
           ].map((item, i) => (
-            <div key={i} className="text-center">
-              <div className="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                <item.icon className="h-6 w-6 text-brand-600" />
+            <div key={i} className="bg-white rounded-2xl border border-amber-100 p-6 shadow-md hover:shadow-lg transition-all">
+              <div className={clsx('w-12 h-12 rounded-xl flex items-center justify-center mb-4', item.color)}>
+                <item.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-semibold text-gray-900">{item.title}</h3>
-              <p className="text-sm text-gray-500">{item.desc}</p>
+              <h3 className="font-semibold text-amber-950 mb-2">{item.title}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
+
+        {/* Tagline */}
+        <p className="text-amber-600 text-sm font-medium">
+          GradPath — Your compass to graduation
+        </p>
       </div>
     )
   }
@@ -769,11 +798,11 @@ export default function PlanPage() {
   return (
     <div className="space-y-6 pb-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-8 text-white">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
+      <div className="relative overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 rounded-2xl p-8 text-white">
+        {/* Background pattern - organic feel */}
+        <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }} />
         </div>
 

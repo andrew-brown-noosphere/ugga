@@ -14,6 +14,8 @@ import {
   Save,
   Link as LinkIcon,
   Camera,
+  Heart,
+  X,
 } from 'lucide-react'
 import { getCurrentUser, updateUserPreferences, getPersonalizedReport, getPrograms } from '../lib/api'
 import { clsx } from 'clsx'
@@ -37,6 +39,30 @@ const CLASSIFICATIONS = [
 
 const GRADUATION_YEARS = Array.from({ length: 10 }, (_, i) => 2024 + i)
 
+// Suggested interests for elective recommendations
+const SUGGESTED_INTERESTS = [
+  'AI & Machine Learning',
+  'Web Development',
+  'Mobile Apps',
+  'Game Development',
+  'Data Science',
+  'Cybersecurity',
+  'Music & Audio',
+  'Visual Arts',
+  'Creative Writing',
+  'Film & Media',
+  'Business & Entrepreneurship',
+  'Health & Fitness',
+  'Environmental Science',
+  'Psychology',
+  'Foreign Languages',
+  'History & Culture',
+  'Public Speaking',
+  'Research',
+  'Social Justice',
+  'Sports & Recreation',
+]
+
 export default function ProfilePage() {
   const { isSignedIn, isLoaded } = useAuth()
   const queryClient = useQueryClient()
@@ -45,6 +71,7 @@ export default function ProfilePage() {
   // Academic fields
   const [major, setMajor] = useState('')
   const [goal, setGoal] = useState('')
+  const [interests, setInterests] = useState<string[]>([])
 
   // Extended profile fields
   const [photoUrl, setPhotoUrl] = useState('')
@@ -84,6 +111,7 @@ export default function ProfilePage() {
     if (user) {
       setMajor(user.major || '')
       setGoal(user.goal || '')
+      setInterests(user.interests || [])
       setPhotoUrl(user.photo_url || '')
       setBio(user.bio || '')
       setGraduationYear(user.graduation_year || '')
@@ -102,6 +130,7 @@ export default function ProfilePage() {
     mutationFn: (data: {
       major?: string
       goal?: string
+      interests?: string[]
       photo_url?: string
       bio?: string
       graduation_year?: number
@@ -125,6 +154,7 @@ export default function ProfilePage() {
     updateMutation.mutate({
       major: major || undefined,
       goal: goal || undefined,
+      interests: interests.length > 0 ? interests : undefined,
       photo_url: photoUrl || undefined,
       bio: bio || undefined,
       graduation_year: graduationYear ? Number(graduationYear) : undefined,
@@ -343,6 +373,62 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Interests/Hobbies */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Heart className="h-4 w-4 inline mr-1" />
+                Interests & Hobbies
+              </label>
+              <p className="text-xs text-gray-500 mb-3">
+                Help us recommend electives that match your interests (select up to 5)
+              </p>
+
+              {/* Selected interests */}
+              {interests.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {interests.map((interest) => (
+                    <span
+                      key={interest}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm"
+                    >
+                      {interest}
+                      <button
+                        type="button"
+                        onClick={() => setInterests(interests.filter((i) => i !== interest))}
+                        className="hover:text-amber-900"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Suggested interests */}
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTED_INTERESTS.filter((i) => !interests.includes(i)).map((interest) => (
+                  <button
+                    key={interest}
+                    type="button"
+                    onClick={() => {
+                      if (interests.length < 5) {
+                        setInterests([...interests, interest])
+                      }
+                    }}
+                    disabled={interests.length >= 5}
+                    className={clsx(
+                      'px-3 py-1 rounded-full text-sm border transition-colors',
+                      interests.length >= 5
+                        ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'border-gray-300 text-gray-700 hover:border-amber-400 hover:bg-amber-50'
+                    )}
+                  >
+                    + {interest}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Social Links */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -480,6 +566,26 @@ export default function ProfilePage() {
                 </p>
               </div>
             </div>
+
+            {/* Interests Display */}
+            {user?.interests && user.interests.length > 0 && (
+              <div className="p-4 bg-amber-50 rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-amber-700 mb-2">
+                  <Heart className="h-4 w-4" />
+                  Interests
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {user.interests.map((interest) => (
+                    <span
+                      key={interest}
+                      className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm"
+                    >
+                      {interest}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Social Links Display */}
             {(user?.linkedin_url || user?.github_url || user?.twitter_url || user?.website_url || user?.instagram_url || user?.tiktok_url || user?.bluesky_url) && (

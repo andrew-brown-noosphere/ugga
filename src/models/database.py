@@ -842,6 +842,10 @@ class User(Base):
     major: Mapped[Optional[str]] = mapped_column(String(200))
     goal: Mapped[Optional[str]] = mapped_column(String(50))  # fast-track, specialist, well-rounded, flexible
 
+    # Interests/hobbies for elective recommendations (JSON array)
+    # Example: ["AI/Machine Learning", "Game Development", "Music", "Health & Fitness"]
+    interests: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Extended profile
     photo_url: Mapped[Optional[str]] = mapped_column(String(500))
     bio: Mapped[Optional[str]] = mapped_column(Text)

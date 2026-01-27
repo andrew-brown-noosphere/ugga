@@ -376,6 +376,7 @@ class UserResponse(BaseModel):
     last_name: Optional[str] = None
     major: Optional[str] = None
     goal: Optional[str] = None
+    interests: Optional[list[str]] = None  # Hobbies/interests for elective recommendations
     # Extended profile
     photo_url: Optional[str] = None
     bio: Optional[str] = None
@@ -396,6 +397,7 @@ class UserUpdateRequest(BaseModel):
     """Request to update user preferences."""
     major: Optional[str] = Field(None, max_length=200)
     goal: Optional[str] = Field(None, pattern="^(fast-track|specialist|well-rounded|flexible)$")
+    interests: Optional[list[str]] = Field(None, max_length=10)  # Max 10 interests
     # Extended profile
     photo_url: Optional[str] = Field(None, max_length=500)
     bio: Optional[str] = Field(None, max_length=1000)

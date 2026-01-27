@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from src.config import settings
 from src.services.embedding_service import create_embedding_service
 from src.services.progress_service import ProgressService
+from src.services.audit_service import AuditService
 
 
 @dataclass
@@ -45,6 +46,7 @@ IMPORTANT GUIDELINES:
 7. Remind students to verify information with their academic advisor for official decisions
 8. When student profile data is available, personalize your recommendations based on their completed courses and degree progress
 9. Check prerequisites against the student's completed courses when recommending classes
+10. When recommending electives, prioritize courses that align with the student's stated interests and hobbies - suggest courses that combine their academic requirements with personal passions
 
 DISCLAIMER: Always include this at the end of responses involving academic planning:
 "Note: This is AI-generated guidance. Please verify with your academic advisor and the official UGA Bulletin."
@@ -55,7 +57,7 @@ You have access to:
 - Syllabus content from various courses
 - Degree program requirements
 - Professor information and ratings
-- Student's academic profile (when logged in): completed courses, major, GPA, degree progress"""
+- Student's academic profile (when logged in): completed courses, major, GPA, degree progress, interests/hobbies"""
 
 
 class AIChatService:
@@ -68,6 +70,7 @@ class AIChatService:
         self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
         self.embedding_service = create_embedding_service()
         self.progress_service = ProgressService()
+        self.audit_service = AuditService()
         self.model = "claude-sonnet-4-20250514"
 
     def _get_user_context(self, user_id: int) -> tuple[str, set[str]]:
@@ -143,9 +146,147 @@ class AIChatService:
             elif user.major:
                 context_parts.append(f"\n**Major (from profile):** {user.major}\n")
 
+            # Get user interests for elective recommendations
+            if user.interests:
+                import json
+                try:
+                    interests_list = json.loads(user.interests)
+                    if interests_list:
+                        context_parts.append(f"\n**Interests/Hobbies:** {', '.join(interests_list)}\n")
+                        context_parts.append("(Use these interests to suggest relevant electives that align with the student's passions)\n")
+                except (json.JSONDecodeError, TypeError):
+                    pass
+
             context_parts.append("\n")
 
         return "".join(context_parts), completed_codes
+
+    def _get_degree_audit_context(self, user_id: int) -> str:
+        """
+        Build degree audit context showing graduation requirements status.
+
+        This tells the AI exactly what courses the student needs to graduate,
+        which requirements are satisfied, and what to take next.
+        """
+        from sqlalchemy import select
+        from src.models.database import get_session_factory, Program, ProgramRequirement, RequirementCourse, BulletinCourse
+
+        context_parts = []
+
+        try:
+            # Get primary enrollment
+            enrollment = self.progress_service.get_primary_enrollment(user_id)
+            if not enrollment:
+                return ""
+
+            # Run or get cached audit
+            try:
+                audit = self.audit_service.run_audit(user_id, enrollment.id)
+            except Exception as e:
+                # If audit fails, try to get basic program info
+                return f"[Could not run degree audit: {str(e)}]\n"
+
+            context_parts.append("## Graduation Requirements Status\n\n")
+            context_parts.append(f"**Program:** {audit.program_name} ({audit.degree_type})\n")
+            context_parts.append(f"**Overall Progress:** {audit.overall_progress_percent:.0f}% complete\n")
+            context_parts.append(f"**Hours:** {audit.total_hours_earned}/{audit.total_hours_required} earned\n")
+            context_parts.append(f"**Status:** {audit.overall_status.value.replace('_', ' ').title()}\n\n")
+
+            # Group requirements by category
+            categories = {}
+            for req in audit.requirements:
+                cat = req.category or "other"
+                if cat not in categories:
+                    categories[cat] = []
+                categories[cat].append(req)
+
+            category_labels = {
+                "major": "Major Requirements",
+                "core": "Core Courses",
+                "foundation": "Foundation/Math/Science",
+                "gen_ed": "General Education",
+                "elective": "Electives",
+                "other": "Other Requirements",
+            }
+
+            # Get remaining courses from database for more detail
+            session_factory = get_session_factory()
+            with session_factory() as session:
+                for cat_key in ["major", "core", "foundation", "gen_ed", "elective", "other"]:
+                    if cat_key not in categories:
+                        continue
+
+                    cat_reqs = categories[cat_key]
+                    cat_label = category_labels.get(cat_key, cat_key.title())
+
+                    # Calculate category totals
+                    cat_hours_req = sum(r.hours_required or 0 for r in cat_reqs)
+                    cat_hours_sat = sum(r.hours_satisfied for r in cat_reqs)
+
+                    context_parts.append(f"### {cat_label} ({cat_hours_sat}/{cat_hours_req} hours)\n\n")
+
+                    for req in cat_reqs:
+                        # Status indicator
+                        if req.status.value == "complete":
+                            status_icon = "✓"
+                        elif req.status.value == "in_progress":
+                            status_icon = "◐"
+                        else:
+                            status_icon = "○"
+
+                        context_parts.append(f"**{status_icon} {req.requirement_name}**")
+                        if req.hours_required:
+                            context_parts.append(f" ({req.hours_satisfied}/{req.hours_required} hrs)")
+                        context_parts.append("\n")
+
+                        # Show courses applied (satisfied)
+                        if req.courses_applied:
+                            satisfied = [f"{c.course_code}" for c in req.courses_applied[:5]]
+                            context_parts.append(f"  - Completed: {', '.join(satisfied)}\n")
+
+                        # Show remaining courses needed
+                        if req.remaining_courses:
+                            remaining = req.remaining_courses[:8]  # Limit to 8
+                            context_parts.append(f"  - Still needed: {', '.join(remaining)}\n")
+
+                        # For incomplete requirements, fetch actual course options
+                        if req.status.value != "complete" and not req.remaining_courses:
+                            # Try to get courses for this requirement from DB
+                            req_courses = session.execute(
+                                select(RequirementCourse)
+                                .where(RequirementCourse.requirement_id == req.requirement_id)
+                                .limit(10)
+                            ).scalars().all()
+
+                            if req_courses:
+                                course_codes = [rc.course_code for rc in req_courses if not rc.is_group]
+                                if course_codes:
+                                    context_parts.append(f"  - Options: {', '.join(course_codes[:8])}\n")
+
+                    context_parts.append("\n")
+
+            # Add planning guidance
+            context_parts.append("### Planning Guidance\n\n")
+
+            # Calculate semesters remaining (assuming 15 hrs/semester)
+            hours_remaining = audit.total_hours_required - audit.total_hours_earned
+            semesters_at_15 = (hours_remaining + 14) // 15  # Round up
+            semesters_at_12 = (hours_remaining + 11) // 12
+
+            context_parts.append(f"- **Hours remaining:** {hours_remaining}\n")
+            context_parts.append(f"- **Semesters at 15 hrs/sem:** ~{semesters_at_15}\n")
+            context_parts.append(f"- **Semesters at 12 hrs/sem:** ~{semesters_at_12}\n")
+
+            # Recommended next courses
+            if audit.recommended_next_courses:
+                context_parts.append(f"- **Suggested next:** {', '.join(audit.recommended_next_courses[:6])}\n")
+
+            context_parts.append("\n")
+
+        except Exception as e:
+            context_parts.append(f"[Error loading degree audit: {str(e)}]\n")
+
+        return "".join(context_parts)
 
     def _extract_course_codes(self, query: str) -> list[str]:
         """Extract course codes mentioned in the query (e.g., CSCI 1302, CHEM 2211)."""
@@ -381,9 +522,12 @@ Content excerpt: {doc.get('content', '')[:500]}...
 
         # Add user context if authenticated
         user_context = ""
+        degree_audit_context = ""
         completed_codes: set[str] = set()
         if user_id:
             user_context, completed_codes = self._get_user_context(user_id)
+            # Get degree audit for graduation planning questions
+            degree_audit_context = self._get_degree_audit_context(user_id)
 
         # Build messages for Claude
         messages = []
@@ -400,6 +544,8 @@ Content excerpt: {doc.get('content', '')[:500]}...
         context_sections = []
         if user_context:
             context_sections.append(user_context)
+        if degree_audit_context:
+            context_sections.append(degree_audit_context)
         context_sections.append(context)
 
         full_context = "\n".join(context_sections)

@@ -34,13 +34,16 @@ export default function InstructorPage() {
   const [claimSuccess, setClaimSuccess] = useState('')
   const [claiming, setClaiming] = useState(false)
 
+  // Negative ID = unclaimed instructor (stub profile)
+  const isUnclaimedProfile = professorId < 0
+
   const { data: professor, isLoading } = useQuery({
     queryKey: ['professor', professorId],
     queryFn: () => getProfessor(professorId),
-    enabled: professorId > 0,
+    enabled: professorId !== 0,
   })
 
-  // Get like stats
+  // Get like stats (only for claimed profiles with positive IDs)
   const { data: likeStats } = useQuery({
     queryKey: ['instructorLikeStats', professorId],
     queryFn: () => getInstructorLikeStats(professorId),
@@ -62,7 +65,7 @@ export default function InstructorPage() {
     },
   })
 
-  // Get follow stats
+  // Get follow stats (only for claimed profiles with positive IDs)
   const { data: followStats } = useQuery({
     queryKey: ['instructorFollowStats', professorId],
     queryFn: () => getInstructorFollowStats(professorId),
@@ -87,13 +90,13 @@ export default function InstructorPage() {
   const { data: courses } = useQuery({
     queryKey: ['professor-courses', professorId],
     queryFn: () => getProfessorCourses(professorId),
-    enabled: professorId > 0,
+    enabled: professorId !== 0,
   })
 
   const { data: syllabi } = useQuery({
     queryKey: ['professor-syllabi', professorId],
     queryFn: () => getProfessorSyllabi(professorId),
-    enabled: professorId > 0,
+    enabled: professorId !== 0,
   })
 
   const handleClaimSubmit = async (e: React.FormEvent) => {
@@ -312,14 +315,30 @@ export default function InstructorPage() {
           </div>
         </div>
 
-        {/* Claim Banner */}
+        {/* Claim Banner - Prominent for stub profiles */}
         {!professor.is_claimed && (
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className={clsx(
+            "mt-6 p-4 rounded-lg border",
+            isUnclaimedProfile
+              ? "bg-gradient-to-r from-brand-50 to-blue-50 border-brand-200"
+              : "bg-blue-50 border-blue-200"
+          )}>
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-blue-900">Is this your profile?</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  Claim this profile to add office hours, update your bio, and more.
+                <h3 className={clsx(
+                  "font-medium",
+                  isUnclaimedProfile ? "text-brand-900 text-lg" : "text-blue-900"
+                )}>
+                  {isUnclaimedProfile ? "Claim This Profile" : "Is this your profile?"}
+                </h3>
+                <p className={clsx(
+                  "text-sm mt-1",
+                  isUnclaimedProfile ? "text-brand-700" : "text-blue-700"
+                )}>
+                  {isUnclaimedProfile
+                    ? "Are you this instructor? Claim this profile to add your photo, office hours, bio, and connect with students."
+                    : "Claim this profile to add office hours, update your bio, and more."
+                  }
                 </p>
               </div>
               {isSignedIn ? (
@@ -330,7 +349,9 @@ export default function InstructorPage() {
                   Claim Profile
                 </button>
               ) : (
-                <p className="text-sm text-blue-600">Sign in to claim</p>
+                <SignInButton mode="modal">
+                  <button className="btn btn-primary">Sign in to Claim</button>
+                </SignInButton>
               )}
             </div>
 
@@ -354,7 +375,7 @@ export default function InstructorPage() {
       </div>
 
       {/* Office Hours & Bio */}
-      {(professor.office_hours || professor.bio) && (
+      {(professor.office_hours || professor.bio) ? (
         <div className="card">
           {professor.office_hours && (
             <div className="mb-4">
@@ -375,6 +396,18 @@ export default function InstructorPage() {
               <p className="mt-2 text-gray-600 whitespace-pre-wrap">{professor.bio}</p>
             </div>
           )}
+        </div>
+      ) : isUnclaimedProfile && (
+        <div className="card bg-gray-50 border-dashed border-2 border-gray-200">
+          <div className="text-center py-6">
+            <User className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">
+              No profile information available yet.
+            </p>
+            <p className="text-gray-400 text-xs mt-1">
+              This profile can be claimed by the instructor.
+            </p>
+          </div>
         </div>
       )}
 

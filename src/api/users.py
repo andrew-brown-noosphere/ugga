@@ -28,6 +28,40 @@ from src.api.auth import get_current_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+
+def _user_to_response(user: User) -> UserResponse:
+    """Convert User model to UserResponse, handling interests JSON."""
+    # Parse interests from JSON string to list
+    interests = None
+    if user.interests:
+        try:
+            interests = json.loads(user.interests)
+        except (json.JSONDecodeError, TypeError):
+            interests = None
+
+    return UserResponse(
+        id=user.id,
+        clerk_id=user.clerk_id,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        major=user.major,
+        goal=user.goal,
+        interests=interests,
+        photo_url=user.photo_url,
+        bio=user.bio,
+        graduation_year=user.graduation_year,
+        classification=user.classification,
+        linkedin_url=user.linkedin_url,
+        github_url=user.github_url,
+        twitter_url=user.twitter_url,
+        website_url=user.website_url,
+        instagram_url=user.instagram_url,
+        tiktok_url=user.tiktok_url,
+        bluesky_url=user.bluesky_url,
+        created_at=user.created_at,
+    )
+
 # Disclaimer text for all reports
 DISCLAIMER_TEXT = (
     "This report is based on official UGA class schedules that can be found at "
@@ -152,7 +186,7 @@ async def sync_user_webhook(
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_profile(user: User = Depends(get_current_user)):
     """Get current user's profile."""
-    return UserResponse.model_validate(user)
+    return _user_to_response(user)
 
 
 @router.put("/me", response_model=UserResponse)
@@ -172,6 +206,9 @@ async def update_user_preferences(
             db_user.major = update.major
         if update.goal is not None:
             db_user.goal = update.goal
+        if update.interests is not None:
+            # Store as JSON string
+            db_user.interests = json.dumps(update.interests) if update.interests else None
 
         # Extended profile
         if update.photo_url is not None:
@@ -192,10 +229,16 @@ async def update_user_preferences(
             db_user.twitter_url = update.twitter_url
         if update.website_url is not None:
             db_user.website_url = update.website_url
+        if update.instagram_url is not None:
+            db_user.instagram_url = update.instagram_url
+        if update.tiktok_url is not None:
+            db_user.tiktok_url = update.tiktok_url
+        if update.bluesky_url is not None:
+            db_user.bluesky_url = update.bluesky_url
 
         session.commit()
         session.refresh(db_user)
-        return UserResponse.model_validate(db_user)
+        return _user_to_response(db_user)
 
 
 @router.get("/me/report", response_model=PersonalizedReportResponse)

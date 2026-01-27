@@ -148,6 +148,7 @@ export interface User {
   last_name: string | null
   major: string | null
   goal: string | null
+  interests: string[] | null  // Hobbies/interests for elective recommendations
   // Extended profile
   photo_url: string | null
   bio: string | null
@@ -171,6 +172,7 @@ export interface User {
 export interface UserUpdateRequest {
   major?: string
   goal?: string
+  interests?: string[]
   photo_url?: string
   bio?: string
   graduation_year?: number

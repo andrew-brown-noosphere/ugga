@@ -6,22 +6,21 @@ import { getProfessors } from '../lib/api'
 
 const PAGE_SIZE = 25
 
-// Common UGA departments
+// Departments with claimed faculty profiles (verified instructors)
+// Note: All instructors are searchable, but filter by department only works for claimed profiles
 const DEPARTMENTS = [
-  { code: '', label: 'All Departments' },
-  { code: 'CSCI', label: 'Computer Science' },
+  { code: '', label: 'All Instructors' },
   { code: 'MATH', label: 'Mathematics' },
-  { code: 'ENGL', label: 'English' },
-  { code: 'BIOL', label: 'Biology' },
   { code: 'CHEM', label: 'Chemistry' },
-  { code: 'PHYS', label: 'Physics' },
+  { code: 'ENGL', label: 'English' },
+  { code: 'CSCI', label: 'Computer Science' },
   { code: 'PSYC', label: 'Psychology' },
+  { code: 'STAT', label: 'Statistics' },
+  { code: 'SOCI', label: 'Sociology' },
   { code: 'HIST', label: 'History' },
-  { code: 'POLS', label: 'Political Science' },
-  { code: 'ECON', label: 'Economics' },
-  { code: 'ACCT', label: 'Accounting' },
-  { code: 'MGMT', label: 'Management' },
-  { code: 'MKTG', label: 'Marketing' },
+  { code: 'CMLT', label: 'Comparative Literature' },
+  { code: 'PHIL', label: 'Philosophy' },
+  { code: 'PHYS', label: 'Physics' },
 ]
 
 export default function InstructorsPage() {
@@ -81,7 +80,7 @@ export default function InstructorsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Faculty Directory</h1>
-        <p className="text-gray-600">Search and browse UGA faculty members</p>
+        <p className="text-gray-600">Search all UGA instructors - browse profiles or help instructors claim their page</p>
       </div>
 
       {/* Search & Filter */}
@@ -141,56 +140,69 @@ export default function InstructorsPage() {
           </div>
         ) : (
           <>
-          {professors?.map((prof) => (
-            <Link
-              key={prof.id}
-              to={`/instructors/${prof.id}`}
-              className="card flex items-center gap-4 hover:shadow-md transition-shadow"
-            >
-              {/* Photo */}
-              {prof.photo_url ? (
-                <img
-                  src={prof.photo_url}
-                  alt={prof.name}
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <User className="h-8 w-8 text-gray-300" />
-                </div>
-              )}
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900">{prof.name}</h3>
-                {prof.title && (
-                  <p className="text-sm text-gray-600 truncate">{prof.title}</p>
-                )}
-                {prof.department_name && (
-                  <p className="text-sm text-gray-500">{prof.department_name}</p>
-                )}
-                {prof.email && (
-                  <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-                    <Mail className="h-3 w-3" />
-                    {prof.email}
-                  </p>
-                )}
-              </div>
-
-              {/* Rating */}
-              {prof.rmp_rating && (
-                <div className="text-center">
-                  <div className="flex items-center gap-1 text-sm font-semibold">
-                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                    <span>{prof.rmp_rating.toFixed(1)}</span>
+          {professors?.map((prof) => {
+            const isUnclaimed = prof.id < 0
+            return (
+              <Link
+                key={prof.id}
+                to={`/instructors/${prof.id}`}
+                className="card flex items-center gap-4 hover:shadow-md transition-shadow"
+              >
+                {/* Photo */}
+                {prof.photo_url ? (
+                  <img
+                    src={prof.photo_url}
+                    alt={prof.name}
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${isUnclaimed ? 'bg-gray-50 border-2 border-dashed border-gray-200' : 'bg-gray-100'}`}>
+                    <User className="h-8 w-8 text-gray-300" />
                   </div>
-                  <p className="text-xs text-gray-500">RMP</p>
-                </div>
-              )}
+                )}
 
-              <ChevronRight className="h-5 w-5 text-gray-400" />
-            </Link>
-          ))}
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-gray-900">{prof.name}</h3>
+                    {isUnclaimed && (
+                      <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
+                        Claim
+                      </span>
+                    )}
+                  </div>
+                  {prof.title && (
+                    <p className="text-sm text-gray-600 truncate">{prof.title}</p>
+                  )}
+                  {prof.department_name && (
+                    <p className="text-sm text-gray-500">{prof.department_name}</p>
+                  )}
+                  {prof.email && (
+                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                      <Mail className="h-3 w-3" />
+                      {prof.email}
+                    </p>
+                  )}
+                  {isUnclaimed && !prof.title && !prof.department_name && (
+                    <p className="text-xs text-gray-400 mt-1">Profile can be claimed by this instructor</p>
+                  )}
+                </div>
+
+                {/* Rating */}
+                {prof.rmp_rating && (
+                  <div className="text-center">
+                    <div className="flex items-center gap-1 text-sm font-semibold">
+                      <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                      <span>{prof.rmp_rating.toFixed(1)}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">RMP</p>
+                  </div>
+                )}
+
+                <ChevronRight className="h-5 w-5 text-gray-400" />
+              </Link>
+            )
+          })}
 
           {/* Pagination */}
           <div className="flex items-center justify-between pt-4">
