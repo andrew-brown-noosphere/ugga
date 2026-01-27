@@ -47,6 +47,17 @@ import { clsx } from 'clsx'
 import WeeklyCalendar from '../components/WeeklyCalendar'
 import CourseEntryModal from '../components/CourseEntryModal'
 
+// Calculate current semester ONCE at module load (stable reference)
+function getCurrentSemesterString(): string {
+  const now = new Date()
+  const month = now.getMonth() + 1
+  const year = now.getFullYear()
+  if (month >= 1 && month <= 5) return `Spring ${year}`
+  if (month >= 6 && month <= 7) return `Summer ${year}`
+  return `Fall ${year}`
+}
+const CURRENT_SEMESTER = getCurrentSemesterString()
+
 const GOAL_INFO: Record<string, { title: string; icon: React.ElementType; description: string; color: string }> = {
   'fast-track': {
     title: 'Fast Track',
@@ -507,16 +518,6 @@ export default function PlanPage() {
 
   const queryClient = useQueryClient()
 
-  // Current semester for planned sections
-  const currentSemester = useMemo(() => {
-    const now = new Date()
-    const month = now.getMonth() + 1
-    const year = now.getFullYear()
-    if (month >= 1 && month <= 5) return `Spring ${year}`
-    if (month >= 6 && month <= 7) return `Summer ${year}`
-    return `Fall ${year}`
-  }, [])
-
   // Waitlist mutation
   const waitlistMutation = useMutation({
     mutationFn: async (email: string) => {
@@ -527,23 +528,27 @@ export default function PlanPage() {
     },
   })
 
-  // Planned sections query - only fetch when signed in
+  // Planned sections query - only fetch when signed in and on calendar view
   const { data: plannedSections } = useQuery({
-    queryKey: ['plannedSections', currentSemester],
+    queryKey: ['plannedSections', CURRENT_SEMESTER],
     queryFn: async () => {
       const token = await getToken()
       setAuthToken(token)
-      return getPlannedSections(currentSemester)
+      return getPlannedSections(CURRENT_SEMESTER)
     },
-    enabled: isSignedIn,
-    staleTime: 30000, // 30 seconds
+    enabled: isSignedIn && viewMode === 'calendar',
+    staleTime: 60000, // 1 minute
     retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   })
 
   // Memoized set of planned CRNs for quick lookup
   const plannedCrns = useMemo(() => {
-    return new Set(plannedSections?.sections?.map(s => s.crn) || [])
-  }, [plannedSections?.sections])
+    const sections = plannedSections?.sections
+    if (!sections) return new Set<string>()
+    return new Set(sections.map(s => s.crn))
+  }, [plannedSections])
 
   // Add to plan mutation
   const addToPlanMutation = useMutation({
@@ -1074,7 +1079,7 @@ export default function PlanPage() {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-emerald-800 flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5" />
-                  My Schedule for {currentSemester}
+                  My Schedule for {CURRENT_SEMESTER}
                 </h3>
                 <span className="text-sm text-emerald-600">{plannedSections.sections.length} sections</span>
               </div>
@@ -1312,7 +1317,7 @@ export default function PlanPage() {
                     end_time: selectedSection.endTime,
                     building: selectedSection.building || undefined,
                     room: selectedSection.room || undefined,
-                    semester: currentSemester,
+                    semester: CURRENT_SEMESTER,
                   })}
                   disabled={addToPlanMutation.isPending}
                   className={clsx(
