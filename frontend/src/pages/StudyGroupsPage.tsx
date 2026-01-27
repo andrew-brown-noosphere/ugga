@@ -44,7 +44,7 @@ const MEETING_DAYS = [
 ]
 
 export default function StudyGroupsPage() {
-  const { isSignedIn, isLoaded, getToken } = useAuth()
+  const { isSignedIn, getToken } = useAuth()
   const queryClient = useQueryClient()
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [courseFilter, setCourseFilter] = useState('')
@@ -119,17 +119,6 @@ export default function StudyGroupsPage() {
   const handleCreateSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     createMutation.mutate(formData)
-  }
-
-  if (!isLoaded) {
-    return (
-      <div className="space-y-6">
-        <div className="card animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
-          <div className="h-4 bg-gray-200 rounded w-2/3" />
-        </div>
-      </div>
-    )
   }
 
   const isVerified = user?.uga_email_verified

@@ -36,7 +36,7 @@ const COHORTS_FEATURES = [
 ]
 
 export default function CohortsPage() {
-  const { isSignedIn, isLoaded, getToken } = useAuth()
+  const { isSignedIn, getToken } = useAuth()
   const queryClient = useQueryClient()
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
@@ -139,17 +139,6 @@ export default function CohortsPage() {
     navigator.clipboard.writeText(code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
-
-  if (!isLoaded) {
-    return (
-      <div className="space-y-6">
-        <div className="card animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4" />
-          <div className="h-4 bg-gray-200 rounded w-2/3" />
-        </div>
-      </div>
-    )
   }
 
   const isVerified = user?.uga_email_verified
