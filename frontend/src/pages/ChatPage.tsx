@@ -1,9 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Send, Loader2, Bot, User, Sparkles, Mail, CheckCircle } from 'lucide-react'
+import { Send, Loader2, Bot, User, Sparkles, Mail, CheckCircle, MessageCircle } from 'lucide-react'
 import { clsx } from 'clsx'
 import { joinWaitlist } from '../lib/api'
 import type { ChatMessage } from '../types'
+import AuthGate from '../components/AuthGate'
+
+const CHAT_FEATURES = [
+  'Get personalized course recommendations based on your goals',
+  'Ask questions about degree requirements and prerequisites',
+  'Find the best professors and sections for your schedule',
+  'Plan your entire semester with AI-powered insights',
+]
 
 export default function ChatPage() {
   const [input, setInput] = useState('')
@@ -81,6 +89,12 @@ export default function ChatPage() {
   ]
 
   return (
+    <AuthGate
+      icon={MessageCircle}
+      title="AI Course Advisor"
+      description="Get personalized course recommendations and degree planning help"
+      features={CHAT_FEATURES}
+    >
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="text-center mb-8">
@@ -254,5 +268,6 @@ export default function ChatPage() {
         )}
       </div>
     </div>
+    </AuthGate>
   )
 }

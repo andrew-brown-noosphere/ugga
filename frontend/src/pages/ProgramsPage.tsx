@@ -4,6 +4,14 @@ import { Search, GraduationCap, ChevronRight, BookOpen, AlertTriangle } from 'lu
 import { clsx } from 'clsx'
 import { getPrograms } from '../lib/api'
 import type { Program } from '../types'
+import AuthGate from '../components/AuthGate'
+
+const PROGRAMS_FEATURES = [
+  'Browse 44+ degree programs across all colleges',
+  'View detailed graduation requirements by category',
+  'See required courses, electives, and credit hours',
+  'Track prerequisites and course sequencing',
+]
 
 const COLLEGE_NAMES: Record<string, string> = {
   ARTS: 'Franklin College of Arts & Sciences',
@@ -62,6 +70,12 @@ export default function ProgramsPage() {
   }, {} as Record<string, Program[]>)
 
   return (
+    <AuthGate
+      icon={GraduationCap}
+      title="Academic Programs"
+      description="Explore degree requirements and plan your path to graduation"
+      features={PROGRAMS_FEATURES}
+    >
     <div className="space-y-6">
       {/* Header */}
       <div>
@@ -174,6 +188,7 @@ export default function ProgramsPage() {
         </div>
       </div>
     </div>
+    </AuthGate>
   )
 }
 

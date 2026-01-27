@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth, SignInButton } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
 import {
   Users,
   Plus,
@@ -12,6 +12,7 @@ import {
   X,
   Search,
   BookOpen,
+  Users2,
 } from 'lucide-react'
 import {
   getStudyGroups,
@@ -23,6 +24,14 @@ import {
 } from '../lib/api'
 import type { StudyGroup, StudyGroupCreateRequest } from '../types'
 import { clsx } from 'clsx'
+import AuthGate from '../components/AuthGate'
+
+const STUDY_GROUPS_FEATURES = [
+  'Find study groups for any of your courses',
+  'Claim and organize groups with meeting times and locations',
+  'Connect with classmates preparing for exams',
+  'Coordinate study sessions and share resources',
+]
 
 const MEETING_DAYS = [
   'Monday',
@@ -126,6 +135,12 @@ export default function StudyGroupsPage() {
   const isVerified = user?.uga_email_verified
 
   return (
+    <AuthGate
+      icon={Users2}
+      title="Study Groups"
+      description="Connect with classmates and study together"
+      features={STUDY_GROUPS_FEATURES}
+    >
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -133,7 +148,7 @@ export default function StudyGroupsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Study Groups</h1>
           <p className="text-gray-600">Find or create study groups for your courses</p>
         </div>
-        {isSignedIn && isVerified && (
+        {isVerified && (
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn btn-primary flex items-center gap-2"
@@ -168,24 +183,8 @@ export default function StudyGroupsPage() {
         </div>
       </div>
 
-      {/* Not signed in */}
-      {!isSignedIn && (
-        <div className="card text-center py-8">
-          <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Sign in to join study groups
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Connect with fellow students studying the same courses.
-          </p>
-          <SignInButton mode="modal">
-            <button className="btn btn-primary">Sign In</button>
-          </SignInButton>
-        </div>
-      )}
-
       {/* Not verified */}
-      {isSignedIn && !isVerified && (
+      {!isVerified && (
         <div className="card bg-amber-50 border-amber-200">
           <div className="flex items-start gap-3">
             <Users className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -353,7 +352,7 @@ export default function StudyGroupsPage() {
                 </div>
               </div>
 
-              {isSignedIn && isVerified && (
+              {isVerified && (
                 <div className="flex gap-3">
                   {selectedGroup.is_member ? (
                     <>
@@ -552,5 +551,6 @@ export default function StudyGroupsPage() {
         </div>
       )}
     </div>
+    </AuthGate>
   )
 }

@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Search, User, Star, Mail, ChevronRight, ChevronLeft, Building2 } from 'lucide-react'
+import { Search, User, Star, Mail, ChevronRight, ChevronLeft, Building2, Users } from 'lucide-react'
 import { getProfessors } from '../lib/api'
+import AuthGate from '../components/AuthGate'
+
+const FACULTY_FEATURES = [
+  'Browse 2,000+ instructors across all departments',
+  'See instructor ratings and student feedback',
+  'View courses taught and teaching history',
+  'Access syllabi from past semesters',
+]
 
 const PAGE_SIZE = 25
 
@@ -76,6 +84,12 @@ export default function InstructorsPage() {
   }
 
   return (
+    <AuthGate
+      icon={Users}
+      title="Faculty Directory"
+      description="Explore instructor profiles, ratings, and teaching history"
+      features={FACULTY_FEATURES}
+    >
     <div className="space-y-6">
       {/* Header */}
       <div>
@@ -230,5 +244,6 @@ export default function InstructorsPage() {
         )}
       </div>
     </div>
+    </AuthGate>
   )
 }

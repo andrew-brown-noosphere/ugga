@@ -5,6 +5,14 @@ import { Search, Filter, ChevronDown, ChevronUp, Users, Clock, BookOpen, AlertCi
 import { getCourses, getCourse, getSubjects } from '../lib/api'
 import type { Course, CourseFilters } from '../types'
 import { clsx } from 'clsx'
+import AuthGate from '../components/AuthGate'
+
+const COURSES_FEATURES = [
+  'Search 6,900+ courses by keyword, subject, or instructor',
+  'See real-time seat availability and section details',
+  'View course descriptions, prerequisites, and credit hours',
+  'Find courses with open seats that fit your schedule',
+]
 
 export default function CoursesPage() {
   const [filters, setFilters] = useState<CourseFilters>({
@@ -33,6 +41,12 @@ export default function CoursesPage() {
   }
 
   return (
+    <AuthGate
+      icon={BookOpen}
+      title="Course Catalog"
+      description="Search and explore thousands of UGA courses with real-time availability"
+      features={COURSES_FEATURES}
+    >
     <div className="space-y-6">
       {/* Header */}
       <div>
@@ -181,6 +195,7 @@ export default function CoursesPage() {
         </div>
       )}
     </div>
+    </AuthGate>
   )
 }
 

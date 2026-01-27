@@ -1,6 +1,14 @@
 import { useState } from 'react'
-import { CheckCircle, Circle, Clock, Plus, X, AlertCircle } from 'lucide-react'
+import { CheckCircle, Circle, Clock, Plus, X, AlertCircle, GraduationCap } from 'lucide-react'
 import { clsx } from 'clsx'
+import AuthGate from '../components/AuthGate'
+
+const PLANNER_FEATURES = [
+  'Track your progress toward degree completion',
+  'Mark courses as completed, in-progress, or planned',
+  'See which requirements you still need to fulfill',
+  'Identify courses with unmet prerequisites',
+]
 
 // Mock data for now - will connect to API
 const mockProgram = {
@@ -81,6 +89,12 @@ export default function PlannerPage() {
   }
 
   return (
+    <AuthGate
+      icon={GraduationCap}
+      title="Degree Planner"
+      description="Track your progress and plan your path to graduation"
+      features={PLANNER_FEATURES}
+    >
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
@@ -166,6 +180,7 @@ export default function PlannerPage() {
         </div>
       </div>
     </div>
+    </AuthGate>
   )
 }
 

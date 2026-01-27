@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth, SignInButton } from '@clerk/clerk-react'
+import { useAuth } from '@clerk/clerk-react'
 import {
   Users,
   Plus,
@@ -12,6 +12,7 @@ import {
   UserPlus,
   Lock,
   Globe,
+  Heart,
 } from 'lucide-react'
 import {
   getMyCohorts,
@@ -25,6 +26,14 @@ import {
 } from '../lib/api'
 import type { Cohort, CohortMember, CohortCreateRequest } from '../types'
 import { clsx } from 'clsx'
+import AuthGate from '../components/AuthGate'
+
+const COHORTS_FEATURES = [
+  'Join your fraternity or sorority to coordinate class schedules',
+  'Create private groups with friends using invite codes',
+  'See when your group members have overlapping free time',
+  'Plan study sessions around everyone\'s availability',
+]
 
 export default function CohortsPage() {
   const { isSignedIn, isLoaded, getToken } = useAuth()
@@ -146,6 +155,12 @@ export default function CohortsPage() {
   const isVerified = user?.uga_email_verified
 
   return (
+    <AuthGate
+      icon={Heart}
+      title="My Cohorts"
+      description="Coordinate schedules with your friends and groups"
+      features={COHORTS_FEATURES}
+    >
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -153,7 +168,7 @@ export default function CohortsPage() {
           <h1 className="text-2xl font-bold text-gray-900">My Cohorts</h1>
           <p className="text-gray-600">Coordinate schedules with your friends and groups</p>
         </div>
-        {isSignedIn && isVerified && (
+        {isVerified && (
           <div className="flex gap-2">
             <button
               onClick={() => setShowJoinModal(true)}
@@ -173,24 +188,8 @@ export default function CohortsPage() {
         )}
       </div>
 
-      {/* Not signed in */}
-      {!isSignedIn && (
-        <div className="card text-center py-8">
-          <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Sign in to create or join cohorts
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Cohorts help you and your friends coordinate class schedules together.
-          </p>
-          <SignInButton mode="modal">
-            <button className="btn btn-primary">Sign In</button>
-          </SignInButton>
-        </div>
-      )}
-
       {/* Not verified */}
-      {isSignedIn && !isVerified && (
+      {!isVerified && (
         <div className="card bg-amber-50 border-amber-200">
           <div className="flex items-start gap-3">
             <Users className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -208,7 +207,7 @@ export default function CohortsPage() {
       )}
 
       {/* Cohorts List */}
-      {isSignedIn && isVerified && (
+      {isVerified && (
         <>
           {isLoading ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -592,5 +591,6 @@ export default function CohortsPage() {
         </div>
       )}
     </div>
+    </AuthGate>
   )
 }
