@@ -6,6 +6,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Plan your path to graduation. Browse courses, find study groups, and coordinate schedules with friends." />
     <title>GradPath - Smart Course Planning</title>
+
+    <!-- AI Agent Discovery -->
+    <link rel="ai-context" href="/.well-known/context.txt" />
+    <link rel="ai-policy" href="/.well-known/llms.txt" />
+
+    <!-- Open Graph for social/AI previews -->
+    <meta property="og:title" content="GradPath - Smart Course Planning for UGA" />
+    <meta property="og:description" content="AI-powered course planning for University of Georgia students. Browse courses, research instructors, find study groups, and coordinate schedules with friends." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GradPath" />
+
+    <!-- Additional AI hints -->
+    <meta name="ai:status" content="beta-waitlist" />
+    <meta name="ai:institution" content="University of Georgia" />
+    <meta name="ai:disclaimer" content="Not affiliated with or endorsed by UGA" />
+
+    <!-- Structured Data for AI/Search -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "GradPath",
+      "description": "AI-powered course planning tool for University of Georgia students",
+      "url": "https://gradpath.app",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "Free beta access via waitlist"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "GradPath"
+      },
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student",
+        "suggestedMinAge": 17
+      },
+      "isAccessibleForFree": true,
+      "inLanguage": "en-US"
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

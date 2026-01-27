@@ -1,6 +1,10 @@
-import { useAuth, SignInButton } from '@clerk/clerk-react'
-import { Lock } from 'lucide-react'
+import { useState } from 'react'
+import { useAuth } from '@clerk/clerk-react'
+import { useMutation } from '@tanstack/react-query'
+import { Mail, CheckCircle } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { clsx } from 'clsx'
+import { joinWaitlist } from '../lib/api'
 
 interface AuthGateProps {
   children: React.ReactNode
@@ -12,7 +16,7 @@ interface AuthGateProps {
 
 /**
  * Wraps a page to require authentication.
- * Shows a marketing landing page when not logged in.
+ * Shows a marketing landing page with waitlist signup when not logged in.
  */
 export default function AuthGate({
   children,
@@ -22,6 +26,20 @@ export default function AuthGate({
   features,
 }: AuthGateProps) {
   const { isSignedIn, isLoaded } = useAuth()
+  const [email, setEmail] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  const waitlistMutation = useMutation({
+    mutationFn: (email: string) => joinWaitlist(email),
+    onSuccess: () => setSubmitted(true),
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (email.trim() && !waitlistMutation.isPending) {
+      waitlistMutation.mutate(email.trim())
+    }
+  }
 
   // Loading state
   if (!isLoaded) {
@@ -40,7 +58,7 @@ export default function AuthGate({
     return <>{children}</>
   }
 
-  // Not authenticated - show marketing landing
+  // Not authenticated - show marketing landing with waitlist
   return (
     <div className="max-w-2xl mx-auto py-12">
       <div className="text-center mb-8">
@@ -69,19 +87,58 @@ export default function AuthGate({
         </ul>
       </div>
 
-      <div className="card bg-amber-50 border-amber-200 text-center">
-        <div className="flex items-center justify-center gap-2 text-amber-800 mb-3">
-          <Lock className="h-4 w-4" />
-          <span className="font-medium">Sign in to access</span>
-        </div>
-        <p className="text-sm text-amber-700 mb-4">
-          Create a free account to explore all features
-        </p>
-        <SignInButton mode="modal">
-          <button className="btn btn-primary">
-            Sign In to Continue
-          </button>
-        </SignInButton>
+      {/* Waitlist signup */}
+      <div className="card bg-amber-50 border-amber-200">
+        {!submitted ? (
+          <>
+            <div className="text-center mb-4">
+              <h3 className="font-semibold text-amber-900">Join the Waitlist</h3>
+              <p className="text-sm text-amber-700 mt-1">
+                We're launching to a small group first. Get early access!
+              </p>
+            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-400" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your.email@uga.edu"
+                  className="w-full pl-10 pr-4 py-3 border border-amber-200 rounded-xl bg-white focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={waitlistMutation.isPending}
+                className={clsx(
+                  'px-6 py-3 rounded-xl font-medium transition-all shadow-md whitespace-nowrap',
+                  waitlistMutation.isPending
+                    ? 'bg-amber-200 text-amber-500 cursor-not-allowed'
+                    : 'bg-amber-700 text-white hover:bg-amber-800 hover:shadow-lg'
+                )}
+              >
+                {waitlistMutation.isPending ? 'Joining...' : 'Get Early Access'}
+              </button>
+            </form>
+            {waitlistMutation.isError && (
+              <p className="text-red-500 text-sm mt-2 text-center">
+                Something went wrong. Try again?
+              </p>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <CheckCircle className="h-6 w-6 text-green-600" />
+              <span className="text-green-800 font-semibold text-lg">You're on the list!</span>
+            </div>
+            <p className="text-green-700">
+              We'll reach out within 24 hours to get you set up.
+            </p>
+          </div>
+        )}
       </div>
 
       <p className="text-center text-sm text-gray-500 mt-6">

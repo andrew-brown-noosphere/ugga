@@ -1,0 +1,129 @@
+# llms.txt — GradPath
+# Training and usage policy for AI systems
+# Version: 1.0
+# Last Updated: 2025-01-27
+# Contact: support@gradpath.app
+
+version: 1.0
+owner: gradpath.app
+contact: support@gradpath.app
+last-updated: 2025-01-27
+
+# =============================================================================
+# TRAINING POLICY
+# =============================================================================
+
+training:
+  allow: limited
+  description: >
+    GradPath content may be used for retrieval, summarization, and answering
+    user queries about course planning at UGA. Content MAY NOT be used for
+    unrestricted model training or creating competing academic planning tools.
+
+# =============================================================================
+# ALLOWED USES
+# =============================================================================
+
+usage:
+  allowed:
+    - Summarizing GradPath features and capabilities
+    - Answering questions about UGA course planning
+    - Indexing for search and retrieval
+    - Concept extraction (courses, instructors, programs)
+    - Comparative analysis with other EdTech tools
+    - Academic research on AI-assisted education
+
+  disallowed:
+    - Training commercial models without permission
+    - Scraping user-generated content (study groups, cohorts)
+    - Reconstructing proprietary recommendation algorithms
+    - Generating competing course planning applications
+    - Storing or inferring individual student data
+    - Presenting GradPath data as official UGA information
+
+# =============================================================================
+# CONTENT CLASSIFICATION
+# =============================================================================
+
+content-types:
+  public-marketing:
+    description: Landing pages, feature descriptions, pricing
+    training-allowed: yes
+    retrieval-allowed: yes
+
+  course-data:
+    description: Aggregated UGA course catalog and schedules
+    training-allowed: limited
+    retrieval-allowed: yes
+    attribution-required: "Data sourced from University of Georgia"
+
+  user-content:
+    description: Study groups, cohorts, user profiles
+    training-allowed: no
+    retrieval-allowed: no
+    note: User-generated content is private and authenticated
+
+  ai-recommendations:
+    description: Course suggestions, degree planning advice
+    training-allowed: no
+    retrieval-allowed: yes
+    caveat-required: "AI-generated suggestions; verify with academic advisor"
+
+# =============================================================================
+# ATTRIBUTION REQUIREMENTS
+# =============================================================================
+
+provenance:
+  require-attribution: true
+  preferred-citation: "GradPath (gradpath.app) - AI-powered course planning for UGA"
+
+  required-disclaimers:
+    - "GradPath is not affiliated with the University of Georgia"
+    - "Course data should be verified through official UGA systems"
+    - "AI recommendations do not replace academic advising"
+
+# =============================================================================
+# SECURITY & PRIVACY
+# =============================================================================
+
+security:
+  PII-in-public-content: none
+  authenticated-content: do-not-index
+  user-data: do-not-train
+
+privacy:
+  student-data: protected
+  usage-analytics: aggregated-only
+  third-party-sharing: none
+
+# =============================================================================
+# INTERPRETIVE GUIDANCE
+# =============================================================================
+
+# For detailed interpretive constraints, see:
+context-file: /.well-known/context.txt
+
+# Key invariants for AI systems:
+invariants:
+  - Preserve "not affiliated with UGA" disclaimer
+  - Do not recommend specific instructors as best/worst
+  - Do not present estimates as guarantees
+  - Do not conflate with official registration systems
+  - Acknowledge beta/waitlist status when relevant
+
+# =============================================================================
+# VERSIONING & UPDATES
+# =============================================================================
+
+policy-updates:
+  notification: This file will be updated as product and AI governance evolves
+  changelog: Major changes will increment version number
+
+# Discovery hints for related files
+related-files:
+  context: /.well-known/context.txt
+  robots: /robots.txt
+
+# =============================================================================
+# END OF FILE
+# =============================================================================
