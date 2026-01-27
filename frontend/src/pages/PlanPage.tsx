@@ -27,6 +27,7 @@ import {
   Plus,
   Mail,
   CheckCircle,
+  Trash2,
 } from 'lucide-react'
 import { usePlan } from '../context/PlanContext'
 import {
@@ -35,11 +36,11 @@ import {
   getCoursePossibilities,
   getCompletedCourses,
   getQuickProgress,
+  setAuthToken,
+  joinWaitlist,
   getPlannedSections,
   addPlannedSection,
   removePlannedSection,
-  setAuthToken,
-  joinWaitlist,
 } from '../lib/api'
 import type { EnrichedCourseInfo, EnrichedRequirement } from '../types'
 import { clsx } from 'clsx'
@@ -480,7 +481,6 @@ function CourseDetailCard({ course }: { course: EnrichedCourseInfo }) {
 
 export default function PlanPage() {
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
   const { isSignedIn, isLoaded, getToken } = useAuth()
   const { user } = useUser()
   const { plan, clearPlan, hasPlan } = usePlan()
@@ -504,8 +504,18 @@ export default function PlanPage() {
     classSize: number
   } | null>(null)
 
-  // Current semester for planning
-  const currentSemester = 'Spring 2026'
+
+  const queryClient = useQueryClient()
+
+  // Current semester for planned sections
+  const currentSemester = useMemo(() => {
+    const now = new Date()
+    const month = now.getMonth() + 1
+    const year = now.getFullYear()
+    if (month >= 1 && month <= 5) return `Spring ${year}`
+    if (month >= 6 && month <= 7) return `Summer ${year}`
+    return `Fall ${year}`
+  }, [])
 
   // Waitlist mutation
   const waitlistMutation = useMutation({
@@ -517,19 +527,57 @@ export default function PlanPage() {
     },
   })
 
-  // Planned sections - temporarily disabled for debugging
-  const plannedSections = { sections: [], total: 0 }
-  const plannedCrns = new Set<string>()
+  // Planned sections query - only fetch when signed in
+  const { data: plannedSections } = useQuery({
+    queryKey: ['plannedSections', currentSemester],
+    queryFn: async () => {
+      const token = await getToken()
+      setAuthToken(token)
+      return getPlannedSections(currentSemester)
+    },
+    enabled: isSignedIn,
+    staleTime: 30000, // 30 seconds
+    retry: false,
+  })
 
+  // Memoized set of planned CRNs for quick lookup
+  const plannedCrns = useMemo(() => {
+    return new Set(plannedSections?.sections?.map(s => s.crn) || [])
+  }, [plannedSections?.sections])
+
+  // Add to plan mutation
   const addToPlanMutation = useMutation({
-    mutationFn: async (_section: typeof selectedSection) => {
-      throw new Error('Planned sections temporarily disabled')
+    mutationFn: async (section: {
+      crn: string
+      course_code: string
+      course_title?: string
+      instructor?: string
+      days?: string
+      start_time?: string
+      end_time?: string
+      building?: string
+      room?: string
+      semester: string
+    }) => {
+      const token = await getToken()
+      setAuthToken(token)
+      return addPlannedSection(section)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedSections'] })
+      setSelectedSection(null)
     },
   })
 
+  // Remove from plan mutation
   const removeFromPlanMutation = useMutation({
-    mutationFn: async (_sectionId: number) => {
-      throw new Error('Planned sections temporarily disabled')
+    mutationFn: async (sectionId: number) => {
+      const token = await getToken()
+      setAuthToken(token)
+      return removePlannedSection(sectionId)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedSections'] })
     },
   })
 
@@ -1022,27 +1070,29 @@ export default function PlanPage() {
         <div className="space-y-4">
           {/* My Planned Sections */}
           {plannedSections && plannedSections.sections.length > 0 && (
-            <div className="card bg-brand-50 border-brand-200">
+            <div className="card bg-emerald-50 border-emerald-200">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-brand-900">My Schedule ({currentSemester})</h3>
-                <span className="text-sm text-brand-700">{plannedSections.sections.length} section{plannedSections.sections.length !== 1 ? 's' : ''}</span>
+                <h3 className="font-semibold text-emerald-800 flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5" />
+                  My Schedule for {currentSemester}
+                </h3>
+                <span className="text-sm text-emerald-600">{plannedSections.sections.length} sections</span>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {plannedSections.sections.map(section => (
-                  <div
-                    key={section.id}
-                    className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-brand-200"
-                  >
-                    <div>
-                      <div className="font-medium text-sm">{section.course_code}</div>
-                      <div className="text-xs text-gray-500">{section.days} {section.start_time}</div>
+                  <div key={section.id} className="flex items-center justify-between bg-white rounded-lg p-2 border border-emerald-200">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-mono text-sm font-medium text-gray-900">{section.course_code}</div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {section.days} {section.start_time && `· ${section.start_time}`}
+                      </div>
                     </div>
                     <button
                       onClick={() => removeFromPlanMutation.mutate(section.id)}
-                      className="text-gray-400 hover:text-red-500 ml-1"
+                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                       title="Remove from plan"
                     >
-                      ×
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 ))}
@@ -1244,7 +1294,7 @@ export default function PlanPage() {
             <div className="flex gap-3">
               {plannedCrns.has(selectedSection.crn) ? (
                 <button
-                  className="flex-1 btn bg-gray-100 text-gray-600 flex items-center justify-center gap-2 cursor-default"
+                  className="flex-1 btn bg-emerald-100 text-emerald-700 flex items-center justify-center gap-2 cursor-default"
                   disabled
                 >
                   <CheckCircle className="h-4 w-4" />
@@ -1252,9 +1302,25 @@ export default function PlanPage() {
                 </button>
               ) : (
                 <button
-                  onClick={() => addToPlanMutation.mutate(selectedSection)}
+                  onClick={() => addToPlanMutation.mutate({
+                    crn: selectedSection.crn,
+                    course_code: selectedSection.courseCode,
+                    course_title: selectedSection.title,
+                    instructor: selectedSection.instructor,
+                    days: selectedSection.days,
+                    start_time: selectedSection.startTime,
+                    end_time: selectedSection.endTime,
+                    building: selectedSection.building || undefined,
+                    room: selectedSection.room || undefined,
+                    semester: currentSemester,
+                  })}
                   disabled={addToPlanMutation.isPending}
-                  className="flex-1 btn btn-primary flex items-center justify-center gap-2"
+                  className={clsx(
+                    'flex-1 btn flex items-center justify-center gap-2',
+                    addToPlanMutation.isPending
+                      ? 'bg-gray-200 text-gray-500'
+                      : 'btn-primary'
+                  )}
                 >
                   <Plus className="h-4 w-4" />
                   {addToPlanMutation.isPending ? 'Adding...' : 'Add to Plan'}
