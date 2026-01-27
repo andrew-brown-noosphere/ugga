@@ -11,7 +11,7 @@ Handles:
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 
-from src.models.database import User, get_session_factory
+from src.models.database import User, PlannedSection, get_session_factory
 from src.api.schemas import (
     # Completed courses
     CompletedCourseCreate,
@@ -488,24 +488,27 @@ async def get_planned_sections(
     user: User = Depends(get_current_user),
 ):
     """Get user's planned sections for a semester."""
-    from src.models.database import PlannedSection
+    try:
+        session_factory = get_session_factory()
+        with session_factory() as session:
+            query = session.query(PlannedSection).filter(
+                PlannedSection.user_id == user.id
+            )
 
-    session_factory = get_session_factory()
-    with session_factory() as session:
-        query = session.query(PlannedSection).filter(
-            PlannedSection.user_id == user.id
-        )
+            if semester:
+                query = query.filter(PlannedSection.semester == semester)
 
-        if semester:
-            query = query.filter(PlannedSection.semester == semester)
+            query = query.order_by(PlannedSection.created_at.desc())
+            sections = query.all()
 
-        query = query.order_by(PlannedSection.created_at.desc())
-        sections = query.all()
-
-        return PlannedSectionsResponse(
-            sections=[PlannedSectionResponse.model_validate(s) for s in sections],
-            total=len(sections),
-        )
+            return PlannedSectionsResponse(
+                sections=[PlannedSectionResponse.model_validate(s) for s in sections],
+                total=len(sections),
+            )
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/planned", response_model=PlannedSectionResponse)
@@ -514,7 +517,6 @@ async def add_planned_section(
     user: User = Depends(get_current_user),
 ):
     """Add a section to the user's plan."""
-    from src.models.database import PlannedSection
     from sqlalchemy.exc import IntegrityError
 
     session_factory = get_session_factory()
@@ -559,8 +561,6 @@ async def remove_planned_section(
     user: User = Depends(get_current_user),
 ):
     """Remove a section from the user's plan."""
-    from src.models.database import PlannedSection
-
     session_factory = get_session_factory()
     with session_factory() as session:
         section = session.query(PlannedSection).filter(

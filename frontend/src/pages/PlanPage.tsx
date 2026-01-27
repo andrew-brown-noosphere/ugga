@@ -526,6 +526,8 @@ export default function PlanPage() {
       return getPlannedSections(currentSemester)
     },
     enabled: isSignedIn,
+    retry: false,
+    staleTime: 30000,
   })
 
   // Add to plan mutation
