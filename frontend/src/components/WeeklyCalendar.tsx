@@ -4,6 +4,7 @@ import { clsx } from 'clsx'
 
 interface ScheduleBlock {
   id: string
+  crn: string
   courseCode: string
   title?: string
   instructor: string
