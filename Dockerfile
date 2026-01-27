@@ -6,7 +6,7 @@ COPY frontend/package*.json ./
 RUN npm ci
 
 # Cache bust: update this value to force frontend rebuild
-ARG FRONTEND_CACHE_BUST=2026-01-27-v25
+ARG FRONTEND_CACHE_BUST=2026-01-27-v26
 COPY frontend/ ./
 
 # Clerk publishable key (public - safe to include)

@@ -903,12 +903,14 @@ class StudyGroupResponse(BaseModel):
     meeting_day: Optional[str] = None
     meeting_time: Optional[str] = None
     meeting_location: Optional[str] = None
-    organizer_id: int
+    organizer_id: Optional[int] = None  # Nullable for unclaimed groups
     organizer_username: Optional[str] = None
     organizer_first_name: Optional[str] = None
     max_members: int
     member_count: int = 0
     is_active: bool
+    is_official: bool = False  # Pre-seeded groups
+    is_claimable: bool = False  # True if no organizer
     is_member: bool = False
     is_organizer: bool = False
     created_at: datetime
@@ -960,7 +962,9 @@ class CohortResponse(BaseModel):
     id: int
     name: str
     description: Optional[str] = None
-    created_by_id: int
+    org_type: Optional[str] = None  # fraternity, sorority, club, sports, honors, custom
+    is_official: bool = False  # Pre-seeded orgs (can't be deleted)
+    created_by_id: Optional[int] = None  # Nullable for pre-seeded orgs
     created_by_username: Optional[str] = None
     is_public: bool
     max_members: int

@@ -1350,8 +1350,8 @@ class StudyGroup(Base):
     """
     A study group for a specific course.
 
-    Anyone with a verified UGA email can create a study group
-    and become its organizer.
+    Pre-seeded groups have no organizer (claimable).
+    Anyone with a verified UGA email can claim or create a study group.
     """
     __tablename__ = "study_groups"
 
@@ -1365,12 +1365,13 @@ class StudyGroup(Base):
     meeting_time: Mapped[Optional[str]] = mapped_column(String(50))
     meeting_location: Mapped[Optional[str]] = mapped_column(String(200))
 
-    # Organizer
-    organizer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    # Organizer (nullable for unclaimed/pre-seeded groups)
+    organizer_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), index=True, nullable=True)
 
     # Settings
     max_members: Mapped[int] = mapped_column(Integer, default=10)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_official: Mapped[bool] = mapped_column(Boolean, default=False)  # Pre-seeded = official
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -1416,6 +1417,7 @@ class Cohort(Base):
     A cohort is a group of friends who want to take classes together.
 
     Examples: couples, fraternity/sorority members, hometown friends.
+    Pre-seeded cohorts include Greek organizations.
     """
     __tablename__ = "cohorts"
 
@@ -1423,12 +1425,19 @@ class Cohort(Base):
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
 
-    # Creator/admin
-    created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    # Organization type (for pre-seeded orgs)
+    org_type: Mapped[Optional[str]] = mapped_column(String(30), nullable=True, index=True)
+    # Types: fraternity, sorority, club, sports, honors, custom
+
+    # Official = pre-seeded, cannot be deleted by users
+    is_official: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Creator/admin (nullable for pre-seeded orgs)
+    created_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"), index=True, nullable=True)
 
     # Settings
     is_public: Mapped[bool] = mapped_column(Boolean, default=False)
-    max_members: Mapped[int] = mapped_column(Integer, default=20)
+    max_members: Mapped[int] = mapped_column(Integer, default=200)  # Increased for Greek orgs
 
     # Invite code for private cohorts (8 characters)
     invite_code: Mapped[str] = mapped_column(String(8), unique=True, nullable=False)

@@ -66,6 +66,8 @@ def get_study_group_response(
         max_members=group.max_members,
         member_count=member_count,
         is_active=group.is_active,
+        is_official=group.is_official,
+        is_claimable=group.organizer_id is None,
         is_member=is_member,
         is_organizer=is_organizer,
         created_at=group.created_at,
@@ -304,6 +306,53 @@ async def join_study_group(
         session.commit()
 
         return {"success": True, "message": "Joined study group"}
+
+
+@router.post("/{group_id}/claim")
+async def claim_study_group(
+    group_id: int,
+    user: User = Depends(get_current_user),
+):
+    """
+    Claim an unclaimed study group to become the organizer.
+
+    Only works for groups without an organizer (pre-seeded groups).
+    """
+    require_verified(user)
+
+    session_factory = get_session_factory()
+
+    with session_factory() as session:
+        group = session.get(StudyGroup, group_id)
+        if not group:
+            raise HTTPException(status_code=404, detail="Study group not found")
+
+        if group.organizer_id is not None:
+            raise HTTPException(status_code=400, detail="This study group already has an organizer")
+
+        # Claim the group
+        group.organizer_id = user.id
+
+        # Also add user as a member if not already
+        existing_membership = session.execute(
+            select(StudyGroupMember).where(
+                StudyGroupMember.study_group_id == group_id,
+                StudyGroupMember.user_id == user.id
+            )
+        ).scalar_one_or_none()
+
+        if not existing_membership:
+            membership = StudyGroupMember(
+                study_group_id=group_id,
+                user_id=user.id,
+            )
+            session.add(membership)
+
+        session.commit()
+        session.refresh(group)
+
+        member_count = len(group.members)
+        return get_study_group_response(group, member_count, user.id)
 
 
 @router.post("/{group_id}/leave")

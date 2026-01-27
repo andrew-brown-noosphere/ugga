@@ -71,6 +71,8 @@ def get_cohort_response(
         id=cohort.id,
         name=cohort.name,
         description=cohort.description,
+        org_type=cohort.org_type,
+        is_official=cohort.is_official,
         created_by_id=cohort.created_by_id,
         created_by_username=cohort.created_by.username if cohort.created_by else None,
         is_public=cohort.is_public,
@@ -86,6 +88,52 @@ def get_cohort_response(
 # =============================================================================
 # Endpoints
 # =============================================================================
+
+@router.get("/browse", response_model=list[CohortResponse])
+async def browse_cohorts(
+    org_type: Optional[str] = Query(None, description="Filter by org type: fraternity, sorority, club, sports, honors"),
+    search: Optional[str] = Query(None, description="Search by name"),
+    limit: int = Query(50, ge=1, le=100),
+    user: User = Depends(get_current_user),
+):
+    """Browse public and official cohorts (Greek orgs, clubs, etc.)."""
+    require_verified(user)
+
+    session_factory = get_session_factory()
+
+    with session_factory() as session:
+        query = select(Cohort).where(
+            (Cohort.is_public == True) | (Cohort.is_official == True)
+        )
+
+        if org_type:
+            query = query.where(Cohort.org_type == org_type)
+
+        if search:
+            query = query.where(Cohort.name.ilike(f"%{search}%"))
+
+        query = query.order_by(Cohort.name).limit(limit)
+        cohorts = session.execute(query).scalars().all()
+
+        result = []
+        for cohort in cohorts:
+            # Check if user is a member
+            membership = None
+            for member in cohort.members:
+                if member.user_id == user.id:
+                    membership = member
+                    break
+
+            member_count = len(cohort.members)
+            result.append(get_cohort_response(
+                cohort,
+                member_count,
+                user.id,
+                membership.role if membership else None
+            ))
+
+        return result
+
 
 @router.get("", response_model=list[CohortResponse])
 async def list_my_cohorts(
@@ -284,7 +332,7 @@ async def delete_cohort(
     cohort_id: int,
     user: User = Depends(get_current_user),
 ):
-    """Delete cohort. Admin only."""
+    """Delete cohort. Admin only. Cannot delete official cohorts."""
     require_verified(user)
 
     session_factory = get_session_factory()
@@ -293,6 +341,10 @@ async def delete_cohort(
         cohort = session.get(Cohort, cohort_id)
         if not cohort:
             raise HTTPException(status_code=404, detail="Cohort not found")
+
+        # Cannot delete official (pre-seeded) cohorts
+        if cohort.is_official:
+            raise HTTPException(status_code=403, detail="Official organization cohorts cannot be deleted")
 
         # Check admin
         membership = session.execute(
