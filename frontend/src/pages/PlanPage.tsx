@@ -5,15 +5,12 @@ import { useAuth, useUser } from '@clerk/clerk-react'
 import {
   BookOpen,
   ChevronDown,
-  AlertTriangle,
   Settings,
   Target,
   Zap,
   Compass,
   Clock,
   Users,
-  FileText,
-  ExternalLink,
   Calendar,
   List,
   TrendingUp,
@@ -21,7 +18,6 @@ import {
   MessageCircle,
   CheckCircle2,
   MapPin,
-  AlertCircle,
   ArrowRight,
   Plus,
   Mail,
@@ -37,7 +33,7 @@ import {
   setAuthToken,
   joinWaitlist,
 } from '../lib/api'
-import type { EnrichedCourseInfo, EnrichedRequirement } from '../types'
+import type { EnrichedRequirement } from '../types'
 import { clsx } from 'clsx'
 import WeeklyCalendar from '../components/WeeklyCalendar'
 import CourseEntryModal from '../components/CourseEntryModal'
@@ -170,85 +166,6 @@ function InsightCard({
   )
 }
 
-// Course Quick Card - supports both EnrichedCourseInfo and CoursePossibility
-type CourseCardData = {
-  course_code: string
-  title: string | null
-  available_seats: number
-  total_sections: number
-  total_seats: number
-  // Optional schedule info (different structure for each type)
-  instructors?: Array<{ days?: string | null; start_time?: string | null; building?: string | null }>
-  sections?: Array<{ days?: string | null; start_time?: string | null; building?: string | null }>
-  // Possibility-specific
-  priority_reason?: string
-}
-
-function CourseQuickCard({ course, showSchedule = false }: { course: CourseCardData; showSchedule?: boolean }) {
-  const hasSeats = course.available_seats > 0
-  const isOffered = course.total_sections > 0
-  const fillRate = isOffered ? Math.round(((course.total_seats - course.available_seats) / course.total_seats) * 100) : 0
-  const isFillingFast = fillRate > 80 && hasSeats
-
-  // Get schedule info from either instructors or sections
-  const scheduleInfo = course.instructors?.[0] || course.sections?.[0]
-
-  return (
-    <div className={clsx(
-      'group rounded-lg border p-3 transition-all hover:shadow-md cursor-pointer',
-      hasSeats ? 'bg-white border-gray-200 hover:border-brand-300' :
-      isOffered ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'
-    )}>
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-sm font-semibold text-gray-900">{course.course_code}</span>
-            {isFillingFast && (
-              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-medium flex items-center gap-0.5">
-                <TrendingUp className="h-2.5 w-2.5" /> {fillRate}% full
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-gray-600 truncate mt-0.5">{course.title}</p>
-
-          {showSchedule && scheduleInfo?.days && (
-            <div className="flex items-center gap-1 mt-1.5 text-[10px] text-gray-500">
-              <Clock className="h-3 w-3" />
-              <span>{scheduleInfo.days} {scheduleInfo.start_time}</span>
-              {scheduleInfo.building && (
-                <>
-                  <MapPin className="h-3 w-3 ml-1" />
-                  <span>{scheduleInfo.building}</span>
-                </>
-              )}
-            </div>
-          )}
-
-          {course.priority_reason && (
-            <p className="text-[10px] text-brand-600 mt-1">{course.priority_reason}</p>
-          )}
-        </div>
-
-        <div className="text-right flex-shrink-0">
-          {hasSeats ? (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-              {course.available_seats} seats
-            </span>
-          ) : isOffered ? (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-              Full
-            </span>
-          ) : (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
-              Not offered
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // Generate semesters starting from current
 function generateSemesters(startYear: number, startSemester: 'Spring' | 'Summer' | 'Fall', count: number) {
   const semesters: Array<{ label: string; key: string }> = []
@@ -321,166 +238,13 @@ function SemesterBlock({
   )
 }
 
-function CourseDetailCard({ course }: { course: EnrichedCourseInfo }) {
-  const [expanded, setExpanded] = useState(false)
-
-  return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
-      >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <span className="font-mono text-sm font-semibold text-gray-900">
-            {course.course_code}
-          </span>
-          <span className="text-sm text-gray-600 truncate">{course.title}</span>
-        </div>
-        <div className="flex items-center gap-3 text-xs text-gray-500 flex-shrink-0 ml-2">
-          {course.instructors.length > 0 && (
-            <span className="flex items-center gap-1" title="Current instructors">
-              <Users className="h-3.5 w-3.5" />
-              {course.instructors.length}
-            </span>
-          )}
-          {course.syllabi.length > 0 && (
-            <span className="flex items-center gap-1" title="Available syllabi">
-              <FileText className="h-3.5 w-3.5" />
-              {course.syllabi.length}
-            </span>
-          )}
-          {course.available_seats > 0 ? (
-            <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
-              {course.available_seats} seats
-            </span>
-          ) : course.total_sections > 0 ? (
-            <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium">
-              Full
-            </span>
-          ) : (
-            <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium">
-              Not offered
-            </span>
-          )}
-          <ChevronDown className={clsx('h-4 w-4 text-gray-400 transition-transform', expanded && 'rotate-180')} />
-        </div>
-      </button>
-
-      {expanded && (
-        <div className="px-4 py-4 bg-gray-50 border-t border-gray-100 space-y-4">
-          {course.description && (
-            <p className="text-sm text-gray-700">{course.description}</p>
-          )}
-
-          {course.prerequisites && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <div className="flex items-center gap-2 text-amber-700 text-xs font-medium mb-1">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Prerequisites
-              </div>
-              <p className="text-sm text-amber-800">{course.prerequisites}</p>
-            </div>
-          )}
-
-          {course.instructors.length > 0 && (
-            <div>
-              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-                This Semester ({course.total_sections} section{course.total_sections !== 1 ? 's' : ''})
-              </h4>
-              <div className="grid gap-2">
-                {course.instructors.slice(0, 5).map((instructor, i) => (
-                  <Link
-                    key={i}
-                    to={`/instructors?search=${encodeURIComponent(instructor.name)}`}
-                    className={clsx(
-                      'flex items-center justify-between p-2 rounded-lg transition-colors',
-                      instructor.is_available
-                        ? 'bg-white border border-emerald-200 hover:border-emerald-300'
-                        : 'bg-white border border-gray-200 hover:border-gray-300'
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={clsx(
-                        'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium',
-                        instructor.is_available ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'
-                      )}>
-                        {instructor.name.charAt(0)}
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-900">{instructor.name}</span>
-                        {instructor.days && (
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <span>{instructor.days} {instructor.start_time}-{instructor.end_time}</span>
-                            {instructor.building && (
-                              <span className="flex items-center gap-0.5">
-                                <MapPin className="h-3 w-3" />
-                                {instructor.building} {instructor.room}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span className={clsx(
-                      'text-xs font-medium',
-                      instructor.is_available ? 'text-emerald-600' : 'text-gray-500'
-                    )}>
-                      {instructor.seats_available}/{instructor.class_size}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {course.syllabi.length > 0 && (
-            <div>
-              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
-                Syllabi
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {course.syllabi.map((syllabus) => (
-                  syllabus.syllabus_url ? (
-                    <a
-                      key={syllabus.id}
-                      href={syllabus.syllabus_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm text-brand-600 hover:border-brand-300 hover:bg-brand-50 transition-colors"
-                    >
-                      <FileText className="h-3.5 w-3.5" />
-                      {syllabus.semester || 'View'}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  ) : null
-                ))}
-              </div>
-            </div>
-          )}
-
-          {course.bulletin_url && (
-            <a
-              href={course.bulletin_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700"
-            >
-              View in UGA Bulletin <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
 export default function PlanPage() {
   const navigate = useNavigate()
   const { isSignedIn, isLoaded, getToken } = useAuth()
   const { user } = useUser()
   const { plan, clearPlan, hasPlan } = usePlan()
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['major']))
-  const [viewMode, setViewMode] = useState<'overview' | 'list' | 'calendar'>('overview')
+  const [viewMode, setViewMode] = useState<'requirements' | 'calendar'>('requirements')
   const [showCourseEntry, setShowCourseEntry] = useState(false)
   const [waitlistEmail, setWaitlistEmail] = useState('')
   const [waitlistSubmitted, setWaitlistSubmitted] = useState(false)
@@ -880,7 +644,7 @@ export default function PlanPage() {
             title={`${coursesFilling.length} Courses Filling Fast`}
             description={`${coursesFilling.slice(0, 2).map(c => c.course_code).join(', ')} are over 80% full`}
             variant="warning"
-            action={{ label: 'View all', onClick: () => setViewMode('list') }}
+            action={{ label: 'View all', onClick: () => setViewMode('requirements') }}
           />
         )}
         <InsightCard
@@ -946,11 +710,10 @@ export default function PlanPage() {
       {/* View Toggle */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          {viewMode === 'overview' ? 'Course Overview' :
-           viewMode === 'calendar' ? 'Weekly Schedule' : 'All Requirements'}
+          {viewMode === 'requirements' ? 'Degree Requirements' : 'Weekly Schedule'}
         </h2>
         <div className="flex rounded-lg border border-gray-200 overflow-hidden bg-white shadow-sm">
-          {(['overview', 'list', 'calendar'] as const).map((mode) => (
+          {(['requirements', 'calendar'] as const).map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode)}
@@ -959,69 +722,16 @@ export default function PlanPage() {
                 viewMode === mode
                   ? 'bg-brand-600 text-white'
                   : 'text-gray-600 hover:bg-gray-50',
-                mode !== 'overview' && 'border-l border-gray-200'
+                mode === 'calendar' && 'border-l border-gray-200'
               )}
             >
-              {mode === 'overview' && <Sparkles className="h-4 w-4" />}
-              {mode === 'list' && <List className="h-4 w-4" />}
+              {mode === 'requirements' && <List className="h-4 w-4" />}
               {mode === 'calendar' && <Calendar className="h-4 w-4" />}
               <span className="hidden sm:inline capitalize">{mode}</span>
             </button>
           ))}
         </div>
       </div>
-
-      {/* Overview Mode */}
-      {viewMode === 'overview' && (
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Your Options This Semester */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                Your Options This Semester
-              </h3>
-              <span className="text-sm text-gray-500">{possibilitiesList.length} courses</span>
-            </div>
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-              {possibilitiesList.slice(0, 8).map((course, i) => (
-                <CourseQuickCard key={`${course.course_code}-${i}`} course={course} showSchedule />
-              ))}
-              {possibilitiesList.length > 8 && (
-                <button
-                  onClick={() => setViewMode('list')}
-                  className="w-full py-2 text-sm text-brand-600 hover:text-brand-700 font-medium"
-                >
-                  View all {possibilitiesList.length} options
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Filling Fast */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-amber-500" />
-                Register Soon
-              </h3>
-              <span className="text-sm text-gray-500">Filling fast</span>
-            </div>
-            {coursesFilling.length > 0 ? (
-              <div className="space-y-2 max-h-80 overflow-y-auto">
-                {coursesFilling.slice(0, 8).map((course, i) => (
-                  <CourseQuickCard key={`${course.course_code}-${i}`} course={course} showSchedule />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <TrendingUp className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No courses filling up fast yet</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Calendar Mode */}
       {viewMode === 'calendar' && (
@@ -1036,8 +746,8 @@ export default function PlanPage() {
         </div>
       )}
 
-      {/* List Mode */}
-      {viewMode === 'list' && (
+      {/* Requirements Mode */}
+      {viewMode === 'requirements' && (
         <div className="space-y-4">
           {categoryOrder
             .filter(cat => requirementsByCategory[cat])
@@ -1079,30 +789,92 @@ export default function PlanPage() {
                   </button>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 space-y-4 border-t border-gray-100 max-h-[600px] overflow-y-auto">
-                      {requirements.map(req => (
-                        <div key={req.id} className="pt-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="text-sm font-medium text-gray-700">{req.name}</span>
-                            {req.required_hours && (
-                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                {req.required_hours} hrs
-                              </span>
+                    <div className="px-5 pb-5 space-y-6 border-t border-gray-100">
+                      {requirements.map(req => {
+                        // Group courses by subject prefix
+                        const coursesBySubject: Record<string, typeof req.courses> = {}
+                        req.courses?.forEach(course => {
+                          if (course.is_group) return
+                          const subject = course.course_code.replace(/[0-9]/g, '').trim()
+                          if (!coursesBySubject[subject]) coursesBySubject[subject] = []
+                          coursesBySubject[subject]!.push(course)
+                        })
+                        const groupCourses = req.courses?.filter(c => c.is_group) || []
+                        const subjects = Object.keys(coursesBySubject).sort()
+
+                        return (
+                          <div key={req.id} className="pt-4">
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="text-base font-semibold text-gray-900">{req.name}</span>
+                              {req.required_hours && (
+                                <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                                  {req.required_hours} hours required
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Group descriptions */}
+                            {groupCourses.length > 0 && (
+                              <div className="mb-4 space-y-2">
+                                {groupCourses.map((course, i) => (
+                                  <div key={`group-${i}`} className="px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                                    {course.group_description || course.course_code}
+                                  </div>
+                                ))}
+                              </div>
                             )}
+
+                            {/* Courses grouped by subject */}
+                            <div className="space-y-4">
+                              {subjects.map(subject => {
+                                const courses = coursesBySubject[subject] || []
+                                const availableCount = courses.filter(c => c.available_seats > 0).length
+
+                                return (
+                                  <div key={subject}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <span className="text-sm font-medium text-gray-700">{subject}</span>
+                                      <span className="text-xs text-gray-400">
+                                        {courses.length} courses • {availableCount} available
+                                      </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      {courses.map((course, i) => {
+                                        const hasSeats = course.available_seats > 0
+                                        const isOffered = course.total_sections > 0
+                                        const courseNum = course.course_code.replace(/[^0-9]/g, '')
+
+                                        return (
+                                          <Link
+                                            key={`${course.course_code}-${i}`}
+                                            to={`/courses?search=${encodeURIComponent(course.course_code)}`}
+                                            className={clsx(
+                                              'px-3 py-1.5 rounded-lg text-sm font-mono transition-all hover:shadow-md',
+                                              hasSeats
+                                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                                                : isOffered
+                                                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                            )}
+                                            title={`${course.title || course.course_code}${hasSeats ? ` - ${course.available_seats} seats` : isOffered ? ' - Full' : ' - Not offered'}`}
+                                          >
+                                            {courseNum}
+                                            {hasSeats && (
+                                              <span className="ml-1 text-xs opacity-75">
+                                                ({course.available_seats})
+                                              </span>
+                                            )}
+                                          </Link>
+                                        )
+                                      })}
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
                           </div>
-                          <div className="space-y-2">
-                            {req.courses?.slice(0, 15).map((course, i) => (
-                              course.is_group ? (
-                                <div key={`${course.course_code}-${i}`} className="px-4 py-2 bg-gray-50 rounded-lg text-sm text-gray-600 italic">
-                                  {course.group_description || course.course_code}
-                                </div>
-                              ) : (
-                                <CourseDetailCard key={`${course.course_code}-${i}`} course={course} />
-                              )
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 </div>
