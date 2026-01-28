@@ -1048,10 +1048,10 @@ export default function PlanPage() {
               const categoryAvailable = requirements.flatMap(r => r.courses).filter(c => c.available_seats > 0).length
 
               return (
-                <div key={category} className="card overflow-hidden p-0">
+                <div key={category} className="card p-0">
                   <button
                     onClick={() => toggleCategory(category)}
-                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors rounded-t-2xl"
                   >
                     <div className="flex items-center gap-3">
                       <div className={clsx(
@@ -1079,7 +1079,7 @@ export default function PlanPage() {
                   </button>
 
                   {isExpanded && (
-                    <div className="px-5 pb-5 space-y-4 border-t border-gray-100">
+                    <div className="px-5 pb-5 space-y-4 border-t border-gray-100 max-h-[600px] overflow-y-auto">
                       {requirements.map(req => (
                         <div key={req.id} className="pt-4">
                           <div className="flex items-center justify-between mb-3">
