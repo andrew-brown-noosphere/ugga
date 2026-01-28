@@ -183,7 +183,7 @@ export default function ChatPage() {
                   <div className="bg-gradient-to-br from-brand-50 to-brand-100 rounded-2xl rounded-bl-md px-5 py-4 max-w-md border border-brand-200">
                     <p className="text-gray-800 mb-4">
                       We're launching personalized course planning to a small group of students first.
-                      Join the list and we'll reach out within 24 hours to get you set up!
+                      Join the list and we'll reach out soon to get you set up!
                     </p>
                     <form onSubmit={handleWaitlistSubmit} className="flex gap-2">
                       <div className="relative flex-1">
@@ -227,7 +227,7 @@ export default function ChatPage() {
                   <div className="bg-green-50 rounded-2xl rounded-bl-md px-5 py-4 max-w-md border border-green-200">
                     <p className="text-green-800 font-medium">You're on the list!</p>
                     <p className="text-green-700 text-sm mt-1">
-                      We'll reach out within 24 hours to help you plan the perfect semester.
+                      We'll reach out soon to help you plan the perfect semester.
                     </p>
                   </div>
                 </div>

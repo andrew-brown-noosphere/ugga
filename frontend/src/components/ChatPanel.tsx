@@ -211,7 +211,7 @@ export default function ChatPanel({ className }: ChatPanelProps) {
                       Great question! 🎓 We're currently in private beta with limited spots.
                     </p>
                     <p className="text-sm text-gray-800 mb-4">
-                      Join our waitlist and we'll get you set up within 24 hours!
+                      Join our waitlist and we'll get you set up soon!
                     </p>
                     <form
                       onSubmit={(e) => {
@@ -268,7 +268,7 @@ export default function ChatPanel({ className }: ChatPanelProps) {
                       You're on the list! 🎉
                     </p>
                     <p className="text-sm text-green-700">
-                      We'll reach out within 24 hours to get you started. Check your inbox!
+                      We'll reach out soon to get you started. Check your inbox!
                     </p>
                   </div>
                 </div>

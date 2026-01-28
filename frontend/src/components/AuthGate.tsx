@@ -135,7 +135,7 @@ export default function AuthGate({
               <span className="text-green-800 font-semibold text-lg">You're on the list!</span>
             </div>
             <p className="text-green-700">
-              We'll reach out within 24 hours to get you set up.
+              We'll reach out soon to get you set up.
             </p>
           </div>
         )}

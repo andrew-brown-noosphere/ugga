@@ -704,7 +704,7 @@ export default function PlanPage() {
               <span className="text-green-800 font-semibold text-lg">You're on the list!</span>
             </div>
             <p className="text-green-700">
-              We'll reach out within 24 hours to help you plan your path.
+              We'll reach out soon to help you plan your path.
             </p>
           </div>
         )}
