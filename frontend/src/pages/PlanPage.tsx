@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useAuth, useUser } from '@clerk/clerk-react'
@@ -274,11 +274,8 @@ export default function PlanPage() {
     },
   })
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn && !hasPlan) {
-      navigate('/')
-    }
-  }, [hasPlan, navigate, isLoaded, isSignedIn])
+  // Removed redirect that was causing infinite loop when signed in without plan
+  // The plan page now handles this state by showing onboarding prompt
 
   // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   // Progress data queries
@@ -513,7 +510,29 @@ export default function PlanPage() {
     )
   }
 
-  if (!plan) return null
+  // Signed-in user without a plan - prompt them to create one
+  if (!plan) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+        <div className="w-20 h-20 bg-amber-100 border-2 border-amber-200 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+          <Compass className="h-10 w-10 text-amber-700" />
+        </div>
+        <h1 className="text-3xl font-bold text-amber-950 mb-3" style={{ fontFamily: 'Georgia, serif' }}>
+          Let's Build Your Plan
+        </h1>
+        <p className="text-gray-600 mb-8 max-w-lg">
+          Welcome! To get started, tell us about your major and goals so we can create a personalized degree plan for you.
+        </p>
+        <Link
+          to="/programs"
+          className="px-6 py-3 bg-amber-700 text-white rounded-xl font-medium hover:bg-amber-800 transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
+        >
+          <Sparkles className="h-5 w-5" />
+          Choose Your Major
+        </Link>
+      </div>
+    )
+  }
 
   const goalInfo = GOAL_INFO[plan.goal] || GOAL_INFO['flexible']
   const GoalIcon = goalInfo.icon

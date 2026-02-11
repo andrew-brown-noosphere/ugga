@@ -1,0 +1,9 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "uga": "https://uga.edu/ontology/",
+    "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#"
+  },
+  "@type": "uga:CampusGraph",
+  "campuses": []
+}

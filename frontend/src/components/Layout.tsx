@@ -10,12 +10,12 @@ interface LayoutProps {
 
 const navigation = [
   { name: 'My Plan', href: '/plan', icon: Target },
-  { name: 'Programs', href: '/programs', icon: GraduationCap },
+  { name: 'Cohorts', href: '/cohorts', icon: Heart },
+  { name: 'Study Groups', href: '/study-groups', icon: Users2 },
   { name: 'Courses', href: '/courses', icon: BookOpen },
+  { name: 'Programs', href: '/programs', icon: GraduationCap },
   { name: 'Faculty', href: '/instructors', icon: Users },
   { name: 'Planner', href: '/planner', icon: Calendar },
-  { name: 'Study Groups', href: '/study-groups', icon: Users2 },
-  { name: 'Cohorts', href: '/cohorts', icon: Heart },
 ]
 
 export default function Layout({ children }: LayoutProps) {

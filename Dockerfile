@@ -46,5 +46,5 @@ ENV PYTHONPATH=/app
 # Expose port (Railway uses PORT env var)
 EXPOSE 8000
 
-# Run the API with uvicorn
-CMD ["sh", "-c", "uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run migrations then start the API
+CMD ["sh", "-c", "alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -12,6 +12,7 @@ from src.config import settings
 from src.services.embedding_service import create_embedding_service
 from src.services.progress_service import ProgressService
 from src.services.audit_service import AuditService
+from src.services.graduation_optimizer import GraduationOptimizer, OptimizationMode
 
 
 @dataclass
@@ -35,9 +36,10 @@ SYSTEM_PROMPT = """You are an AI assistant that helps students explore courses a
 - Planning their academic schedule
 - Learning about professors and their courses
 - Answering questions about prerequisites and course content
+- Generating optimized graduation paths based on goals and lifestyle
 
 IMPORTANT GUIDELINES:
-1. Base your answers on the provided context (courses, syllabi, program data, student profile)
+1. Base your answers on the provided context (courses, syllabi, program data, student profile, graduation path)
 2. If the context doesn't contain enough information, say so honestly
 3. Always mention specific course codes (e.g., CSCI 1302) when recommending courses
 4. Include relevant details like prerequisites, credit hours, and availability when helpful
@@ -46,7 +48,15 @@ IMPORTANT GUIDELINES:
 7. Remind students to verify information with their academic advisor for official decisions
 8. When student profile data is available, personalize your recommendations based on their completed courses and degree progress
 9. Check prerequisites against the student's completed courses when recommending classes
-10. When recommending electives, prioritize courses that align with the student's stated interests and hobbies - suggest courses that combine their academic requirements with personal passions
+10. When recommending electives, prioritize courses that align with the student's stated interests and hobbies
+
+SCHEDULE OPTIMIZATION:
+When students describe their goals or lifestyle constraints, use the graduation path context to suggest optimal schedules:
+- "Graduate ASAP" mode: Recommend maximum course loads, prioritize required courses
+- "Party mode": Suggest easier classes with highly-rated professors, avoid 8am classes
+- Work schedule: Avoid recommending classes that conflict with stated work hours
+- Commuter: Group classes to minimize days on campus
+Always explain WHY you're recommending specific courses based on their stated goals.
 
 DISCLAIMER: Always include this at the end of responses involving academic planning:
 "Note: This is AI-generated guidance. Please verify with your academic advisor and the official UGA Bulletin."
@@ -56,8 +66,9 @@ You have access to:
 - Course descriptions and prerequisites from the UGA Bulletin
 - Syllabus content from various courses
 - Degree program requirements
-- Professor information and ratings
-- Student's academic profile (when logged in): completed courses, major, GPA, degree progress, interests/hobbies"""
+- Professor information and ratings (including difficulty)
+- Student's academic profile (when logged in): completed courses, major, GPA, degree progress, interests/hobbies
+- Graduation path optimizer with multiple optimization modes"""
 
 
 class AIChatService:
@@ -71,6 +82,7 @@ class AIChatService:
         self.embedding_service = create_embedding_service()
         self.progress_service = ProgressService()
         self.audit_service = AuditService()
+        self.graduation_optimizer = GraduationOptimizer()
         self.model = "claude-sonnet-4-20250514"
 
     def _get_user_context(self, user_id: int) -> tuple[str, set[str]]:
@@ -285,6 +297,90 @@ class AIChatService:
 
         except Exception as e:
             context_parts.append(f"[Error loading degree audit: {str(e)}]\n")
+
+        return "".join(context_parts)
+
+    def _is_schedule_planning_query(self, query: str) -> bool:
+        """Detect if query is about schedule planning or graduation path."""
+        schedule_keywords = [
+            "schedule", "next semester", "what should i take",
+            "graduate", "graduation", "path", "plan",
+            "party mode", "easy classes", "easy schedule",
+            "graduate fast", "graduate quickly", "asap",
+            "work", "i work", "job", "part-time",
+            "junior", "senior", "freshman", "sophomore",
+            "pre-law", "pre-med", "pre-vet",
+            "how many semesters", "when can i graduate",
+            "what classes", "recommend courses", "suggest courses",
+            "afternoon classes", "morning classes", "no early",
+            "tuesday thursday", "monday wednesday friday",
+        ]
+        query_lower = query.lower()
+        return any(kw in query_lower for kw in schedule_keywords)
+
+    def _get_graduation_path_context(self, user_id: int, query: str) -> str:
+        """
+        Get graduation path context for schedule planning queries.
+
+        Detects optimization mode from query and generates relevant path.
+        """
+        context_parts = []
+
+        try:
+            # Detect optimization mode from query
+            query_lower = query.lower()
+            if any(kw in query_lower for kw in ["party", "easy", "chill", "laid back", "social"]):
+                mode = OptimizationMode.PARTY_MODE
+                mode_desc = "Party Mode (easy classes, good instructors)"
+            elif any(kw in query_lower for kw in ["fast", "asap", "quickly", "soon", "minimum time"]):
+                mode = OptimizationMode.GRADUATE_ASAP
+                mode_desc = "Graduate ASAP (maximum progress)"
+            else:
+                mode = OptimizationMode.BALANCED
+                mode_desc = "Balanced (reasonable load with good options)"
+
+            # Generate graduation path
+            path = self.graduation_optimizer.generate_path(
+                user_id=user_id,
+                mode=mode,
+                hours_per_semester=15 if mode != OptimizationMode.PARTY_MODE else 12,
+            )
+
+            context_parts.append("## Graduation Path Analysis\n")
+            context_parts.append(f"**Optimization Mode:** {mode_desc}\n")
+            context_parts.append(f"**Current Hours:** {path.current_hours}\n")
+            context_parts.append(f"**Hours Remaining:** {path.hours_remaining}\n")
+            context_parts.append(f"**Estimated Graduation:** {path.estimated_graduation}\n")
+            context_parts.append(f"**Semesters Remaining:** {path.total_semesters_remaining}\n\n")
+
+            # Show next 2 semesters of recommendations
+            for i, sem in enumerate(path.semesters[:2]):
+                context_parts.append(f"### {sem.semester} Suggested Schedule ({sem.total_hours} hours)\n")
+
+                for course in sem.courses:
+                    diff_info = ""
+                    if course.avg_difficulty:
+                        diff_info = f" [Difficulty: {course.avg_difficulty:.1f}/5]"
+                    if course.easiest_section_instructor:
+                        diff_info += f" [Easiest: {course.easiest_section_instructor}]"
+
+                    context_parts.append(
+                        f"- **{course.course_code}** - {course.title} ({course.credit_hours} hrs, "
+                        f"{course.requirement_category}){diff_info}\n"
+                    )
+
+                if sem.notes:
+                    context_parts.append(f"Notes: {'; '.join(sem.notes)}\n")
+                context_parts.append("\n")
+
+            # Add warnings
+            if path.warnings:
+                context_parts.append("**Warnings:**\n")
+                for warning in path.warnings:
+                    context_parts.append(f"- {warning}\n")
+
+        except Exception as e:
+            context_parts.append(f"[Could not generate graduation path: {str(e)}]\n")
 
         return "".join(context_parts)
 
@@ -523,11 +619,15 @@ Content excerpt: {doc.get('content', '')[:500]}...
         # Add user context if authenticated
         user_context = ""
         degree_audit_context = ""
+        graduation_path_context = ""
         completed_codes: set[str] = set()
         if user_id:
             user_context, completed_codes = self._get_user_context(user_id)
             # Get degree audit for graduation planning questions
             degree_audit_context = self._get_degree_audit_context(user_id)
+            # Get graduation path for schedule planning queries
+            if self._is_schedule_planning_query(message):
+                graduation_path_context = self._get_graduation_path_context(user_id, message)
 
         # Build messages for Claude
         messages = []
@@ -546,6 +646,8 @@ Content excerpt: {doc.get('content', '')[:500]}...
             context_sections.append(user_context)
         if degree_audit_context:
             context_sections.append(degree_audit_context)
+        if graduation_path_context:
+            context_sections.append(graduation_path_context)
         context_sections.append(context)
 
         full_context = "\n".join(context_sections)

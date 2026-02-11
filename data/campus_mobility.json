@@ -1,0 +1,122 @@
+{
+  "buildings": 118,
+  "parking": {
+    "Carlton Street Deck": {
+      "coords": [
+        33.9412,
+        -83.378
+      ],
+      "permit": "C,E"
+    },
+    "North Campus Parking Deck": {
+      "coords": [
+        33.9562,
+        -83.3726
+      ],
+      "permit": "C,E,V"
+    },
+    "Hull Street Parking Deck": {
+      "coords": [
+        33.953,
+        -83.3788
+      ],
+      "permit": "C,E"
+    },
+    "East Campus Parking Deck": {
+      "coords": [
+        33.9381,
+        -83.3693
+      ],
+      "permit": "C,E"
+    },
+    "East Campus Village Deck": {
+      "coords": [
+        33.9384,
+        -83.3663
+      ],
+      "permit": "R"
+    },
+    "South Campus Parking Deck": {
+      "coords": [
+        33.9455,
+        -83.3775
+      ],
+      "permit": "C,E"
+    },
+    "Intramural Field Parking Deck": {
+      "coords": [
+        33.9325,
+        -83.3723
+      ],
+      "permit": "C,E"
+    },
+    "West Campus Deck": {
+      "coords": [
+        33.9488,
+        -83.3818
+      ],
+      "permit": "R"
+    },
+    "West Campus Deck II": {
+      "coords": [
+        33.9484,
+        -83.3827
+      ],
+      "permit": "R"
+    },
+    "Tate Center Parking Deck": {
+      "coords": [
+        33.9506,
+        -83.3763
+      ],
+      "permit": "V"
+    },
+    "Clarke County Courthouse Parking Deck": {
+      "coords": [
+        33.9602,
+        -83.3739
+      ],
+      "permit": "V"
+    },
+    "East Broad Street Parking Deck": {
+      "coords": [
+        33.9596,
+        -83.3713
+      ],
+      "permit": "V"
+    },
+    "Performing Arts Center Deck": {
+      "coords": [
+        33.9422,
+        -83.3701
+      ],
+      "permit": "C,E,V"
+    }
+  },
+  "bus_routes": {
+    "East-West": {
+      "frequency": 10,
+      "hours": "7:00 am-6:00 pm"
+    },
+    "Orbit": {
+      "frequency": 12,
+      "hours": "7:30 am-6:00 pm"
+    },
+    "Ag Hill": {
+      "frequency": 15,
+      "hours": "7:30 am-5:30 pm"
+    },
+    "Vet Med": {
+      "frequency": 20,
+      "hours": "7:30 am-5:30 pm"
+    },
+    "Milledge": {
+      "frequency": 15,
+      "hours": "7:00 am-10:00 pm"
+    },
+    "Night Campus": {
+      "frequency": 20,
+      "hours": "6:00 pm-12:00 am"
+    }
+  }
+}

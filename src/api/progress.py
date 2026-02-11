@@ -35,17 +35,29 @@ from src.api.schemas import (
     CourseApplicationResponse,
     WhatIfRequest,
     QuickProgressResponse,
+    # Graduation path
+    GraduationPathRequest,
+    GraduationPathResponse,
+    SemesterPlanResponse,
+    CourseOptionResponse,
+    WhatIfScenariosRequest,
+    WhatIfScenariosResponse,
+    WhatIfScenarioResult,
 )
 from src.api.auth import get_current_user
 from src.services.progress_service import ProgressService, create_progress_service
 from src.services.audit_service import AuditService, create_audit_service
 from src.services.rules_engine import SatisfactionStatus
+from src.services.graduation_optimizer import (
+    GraduationOptimizer, OptimizationMode, create_graduation_optimizer
+)
 
 router = APIRouter(prefix="/progress", tags=["Progress"])
 
 # Service instances
 _progress_service: Optional[ProgressService] = None
 _audit_service: Optional[AuditService] = None
+_graduation_optimizer: Optional[GraduationOptimizer] = None
 
 
 def get_progress_service() -> ProgressService:
@@ -62,6 +74,14 @@ def get_audit_service() -> AuditService:
     if _audit_service is None:
         _audit_service = create_audit_service()
     return _audit_service
+
+
+def get_graduation_optimizer() -> GraduationOptimizer:
+    """Dependency to get GraduationOptimizer instance."""
+    global _graduation_optimizer
+    if _graduation_optimizer is None:
+        _graduation_optimizer = create_graduation_optimizer()
+    return _graduation_optimizer
 
 
 # =============================================================================
@@ -575,3 +595,169 @@ async def remove_planned_section(
         session.commit()
 
         return {"status": "removed"}
+
+
+# =============================================================================
+# Graduation Path Optimizer Endpoints
+# =============================================================================
+
+@router.post("/graduation-path", response_model=GraduationPathResponse)
+async def generate_graduation_path(
+    request: GraduationPathRequest,
+    user: User = Depends(get_current_user),
+    optimizer: GraduationOptimizer = Depends(get_graduation_optimizer),
+):
+    """
+    Generate an optimized graduation path.
+
+    Modes:
+    - graduate_asap: Minimize semesters to graduation (max credit hours)
+    - party_mode: Easy classes, good instructors, optimal social schedule
+    - balanced: Balance between speed and difficulty
+    - interest_based: Align electives with student interests
+    """
+    try:
+        # Convert string mode to enum
+        mode = OptimizationMode(request.mode)
+
+        path = optimizer.generate_path(
+            user_id=user.id,
+            mode=mode,
+            hours_per_semester=request.hours_per_semester,
+            start_semester=request.start_semester,
+            interests=request.interests,
+        )
+
+        return GraduationPathResponse(
+            program_name=path.program_name,
+            degree_type=path.degree_type,
+            optimization_mode=path.optimization_mode.value,
+            current_hours=path.current_hours,
+            hours_remaining=path.hours_remaining,
+            semesters=[
+                SemesterPlanResponse(
+                    semester=sem.semester,
+                    courses=[
+                        CourseOptionResponse(
+                            course_code=c.course_code,
+                            title=c.title,
+                            credit_hours=c.credit_hours,
+                            requirement_name=c.requirement_name,
+                            requirement_category=c.requirement_category,
+                            sections_available=c.sections_available,
+                            seats_available=c.seats_available,
+                            avg_instructor_rating=c.avg_instructor_rating,
+                            avg_difficulty=c.avg_difficulty,
+                            easiest_section_instructor=c.easiest_section_instructor,
+                            easiest_section_crn=c.easiest_section_crn,
+                            prerequisites=c.prerequisites,
+                            prereqs_satisfied=c.prereqs_satisfied,
+                            priority_score=c.priority_score,
+                        )
+                        for c in sem.courses
+                    ],
+                    total_hours=sem.total_hours,
+                    avg_difficulty=sem.avg_difficulty,
+                    total_walking_minutes=sem.total_walking_minutes,
+                    notes=sem.notes,
+                )
+                for sem in path.semesters
+            ],
+            estimated_graduation=path.estimated_graduation,
+            total_semesters_remaining=path.total_semesters_remaining,
+            warnings=path.warnings,
+            generated_at=path.generated_at,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/graduation-path/scenarios", response_model=WhatIfScenariosResponse)
+async def compare_graduation_scenarios(
+    request: WhatIfScenariosRequest,
+    user: User = Depends(get_current_user),
+    optimizer: GraduationOptimizer = Depends(get_graduation_optimizer),
+):
+    """
+    Compare multiple what-if scenarios for graduation planning.
+
+    Example scenarios:
+    - "Take summer classes" with ["CSCI 1302", "MATH 2250"]
+    - "Light fall semester" with ["ENGL 1101", "HIST 2111"]
+    """
+    try:
+        scenarios_data = [
+            {"name": s.name, "courses": s.courses}
+            for s in request.scenarios
+        ]
+
+        results = optimizer.get_what_if_scenarios(user.id, scenarios_data)
+
+        return WhatIfScenariosResponse(
+            scenarios=[
+                WhatIfScenarioResult(
+                    name=r["name"],
+                    courses_added=r["courses_added"],
+                    new_progress_percent=r["new_progress_percent"],
+                    hours_after=r["hours_after"],
+                    hours_remaining=r["hours_remaining"],
+                    estimated_semesters_remaining=r["estimated_semesters_remaining"],
+                )
+                for r in results
+            ]
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/graduation-path/party-mode", response_model=SemesterPlanResponse)
+async def get_party_mode_schedule(
+    semester: str = Query(..., description="Target semester (e.g., Fall 2026)"),
+    target_hours: int = Query(12, ge=12, le=15, description="Target credit hours (12-15 for party mode)"),
+    user: User = Depends(get_current_user),
+    optimizer: GraduationOptimizer = Depends(get_graduation_optimizer),
+):
+    """
+    Generate a party mode schedule for a specific semester.
+
+    Optimizes for:
+    - Low difficulty classes (easy professors)
+    - Good instructor ratings
+    - No early morning classes (optional)
+    - Minimal walking between buildings
+    """
+    try:
+        plan = optimizer.generate_party_mode_schedule(
+            user_id=user.id,
+            semester=semester,
+            target_hours=target_hours,
+        )
+
+        return SemesterPlanResponse(
+            semester=plan.semester,
+            courses=[
+                CourseOptionResponse(
+                    course_code=c.course_code,
+                    title=c.title,
+                    credit_hours=c.credit_hours,
+                    requirement_name=c.requirement_name,
+                    requirement_category=c.requirement_category,
+                    sections_available=c.sections_available,
+                    seats_available=c.seats_available,
+                    avg_instructor_rating=c.avg_instructor_rating,
+                    avg_difficulty=c.avg_difficulty,
+                    easiest_section_instructor=c.easiest_section_instructor,
+                    easiest_section_crn=c.easiest_section_crn,
+                    prerequisites=c.prerequisites,
+                    prereqs_satisfied=c.prereqs_satisfied,
+                    priority_score=c.priority_score,
+                )
+                for c in plan.courses
+            ],
+            total_hours=plan.total_hours,
+            avg_difficulty=plan.avg_difficulty,
+            total_walking_minutes=plan.total_walking_minutes,
+            notes=plan.notes,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

@@ -45,15 +45,7 @@ async def send_message(
 
     The AI uses RAG to search courses, syllabi, and program data
     to provide grounded responses about UGA academics.
-
-    Currently disabled - users must join waitlist first.
     """
-    # Disabled until launch - all users go through waitlist
-    raise HTTPException(
-        status_code=503,
-        detail="AI chat is currently in private beta. Join the waitlist for access!"
-    )
-
     try:
         chat_service = get_chat_service()
 
@@ -66,9 +58,13 @@ async def send_message(
                 if "role" in msg and "content" in msg
             ]
 
+        # Pass user_id for personalized responses when authenticated
+        user_id = user.get("id") if user else None
+
         response = chat_service.chat(
             message=request.message,
             history=history,
+            user_id=user_id,
         )
 
         return ChatMessageResponse(

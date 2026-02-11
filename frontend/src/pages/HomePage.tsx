@@ -14,6 +14,8 @@ import {
   Sparkles,
   Search,
   Zap,
+  Heart,
+  Users2,
 } from 'lucide-react'
 import { getProgramByMajor, getUpcomingEvents } from '../lib/api'
 import { useOnboarding } from '../App'
@@ -88,35 +90,52 @@ export default function HomePage() {
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <FeatureCard
-            icon={GraduationCap}
-            title="Degree Tracking"
-            description="See your progress towards graduation and what courses you still need."
+            icon={Heart}
+            title="Plan with Your Crew"
+            description="Coordinate schedules with your frat, sorority, or friend group."
+          />
+          <FeatureCard
+            icon={Users2}
+            title="Study Groups"
+            description="Find study partners in your classes and collaborate together."
           />
           <FeatureCard
             icon={Zap}
             title="Smart Recommendations"
-            description="Get AI-powered course suggestions based on your goals and preferences."
+            description="Get AI-powered course suggestions based on your goals."
           />
           <FeatureCard
-            icon={Calendar}
-            title="Schedule Builder"
-            description="Build conflict-free schedules with real-time availability data."
+            icon={GraduationCap}
+            title="Degree Tracking"
+            description="See your progress towards graduation at a glance."
           />
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <QuickAction
+            title="Join a Cohort"
+            description="Plan schedules with your friends"
+            href="/cohorts"
+            icon={Heart}
+          />
+          <QuickAction
+            title="Find Study Groups"
+            description="Connect with classmates"
+            href="/study-groups"
+            icon={Users2}
+          />
           <QuickAction
             title="Search Courses"
-            description="Find courses by subject, instructor, or keyword"
+            description="Browse the course catalog"
             href="/courses"
             icon={Search}
           />
           <QuickAction
             title="Explore Programs"
-            description="Browse degree requirements and majors"
+            description="View degree requirements"
             href="/programs"
             icon={BookOpen}
           />
@@ -194,16 +213,28 @@ export default function HomePage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <QuickAction
+              title="Your Cohorts"
+              description="Coordinate with your crew"
+              href="/cohorts"
+              icon={Heart}
+            />
+            <QuickAction
+              title="Study Groups"
+              description="Find study partners"
+              href="/study-groups"
+              icon={Users2}
+            />
             <QuickAction
               title="Search Courses"
-              description="Find courses by subject, instructor, or keyword"
+              description="Browse the catalog"
               href="/courses"
               icon={BookOpen}
             />
             <QuickAction
               title="Degree Planner"
-              description="Build your semester schedule"
+              description="Build your schedule"
               href="/planner"
               icon={Calendar}
             />

@@ -1022,3 +1022,87 @@ class ProfileLikeStats(BaseModel):
     """Profile like statistics."""
     likes_count: int
     is_liked: bool = False
+
+
+# =============================================================================
+# Graduation Path Optimizer Schemas
+# =============================================================================
+
+class GraduationPathRequest(BaseModel):
+    """Request for graduation path optimization."""
+    mode: str = Field(
+        "balanced",
+        pattern="^(graduate_asap|party_mode|balanced|interest_based)$",
+        description="Optimization mode"
+    )
+    hours_per_semester: int = Field(15, ge=12, le=21, description="Target credit hours per semester")
+    start_semester: Optional[str] = Field(None, description="Starting semester (e.g., Fall 2026)")
+    interests: Optional[list[str]] = Field(None, description="Student interests for elective selection")
+
+
+class CourseOptionResponse(BaseModel):
+    """A course option for graduation planning."""
+    course_code: str
+    title: str
+    credit_hours: int
+    requirement_name: str
+    requirement_category: str
+    sections_available: int
+    seats_available: int
+    avg_instructor_rating: Optional[float] = None
+    avg_difficulty: Optional[float] = None
+    easiest_section_instructor: Optional[str] = None
+    easiest_section_crn: Optional[str] = None
+    prerequisites: list[str] = []
+    prereqs_satisfied: bool
+    priority_score: float
+
+
+class SemesterPlanResponse(BaseModel):
+    """A suggested schedule for one semester."""
+    semester: str
+    courses: list[CourseOptionResponse]
+    total_hours: int
+    avg_difficulty: Optional[float] = None
+    total_walking_minutes: int = 0
+    notes: list[str] = []
+
+
+class GraduationPathResponse(BaseModel):
+    """Complete graduation path."""
+    program_name: str
+    degree_type: str
+    optimization_mode: str
+    current_hours: int
+    hours_remaining: int
+    semesters: list[SemesterPlanResponse]
+    estimated_graduation: str
+    total_semesters_remaining: int
+    warnings: list[str] = []
+    generated_at: datetime
+
+
+class WhatIfScenario(BaseModel):
+    """A what-if scenario for comparison."""
+    name: str = Field(..., description="Scenario name (e.g., 'Take summer classes')")
+    courses: list[str] = Field(..., description="Course codes to simulate")
+
+
+class WhatIfScenariosRequest(BaseModel):
+    """Request for multiple what-if scenarios."""
+    scenarios: list[WhatIfScenario]
+
+
+class WhatIfScenarioResult(BaseModel):
+    """Result of a what-if scenario."""
+    name: str
+    courses_added: list[str]
+    new_progress_percent: float
+    hours_after: int
+    hours_remaining: int
+    estimated_semesters_remaining: int
+
+
+class WhatIfScenariosResponse(BaseModel):
+    """Response with multiple what-if scenario results."""
+    scenarios: list[WhatIfScenarioResult]

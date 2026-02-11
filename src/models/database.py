@@ -1552,6 +1552,99 @@ class InstructorFollow(Base):
 
 
 # =============================================================================
+# Seat Alerts and Availability Tracking
+# =============================================================================
+
+class SeatAlert(Base):
+    """
+    User alert for seat availability changes.
+
+    Users can set alerts to be notified when:
+    - Seats become available in a full section
+    - Seat count drops below a threshold
+    - Any change in availability
+    """
+    __tablename__ = "seat_alerts"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+
+    # Section being watched
+    crn: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    course_code: Mapped[str] = mapped_column(String(20), nullable=False)
+    section_code: Mapped[Optional[str]] = mapped_column(String(20))
+    term: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    # Alert configuration
+    alert_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="seats_available"
+    )  # seats_available, seats_below, any_change
+    threshold: Mapped[int] = mapped_column(Integer, default=1)  # For seats_below type
+
+    # Tracking
+    last_known_seats: Mapped[int] = mapped_column(Integer, default=0)
+    last_checked_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    # Status
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    triggered_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    notification_sent: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User")
+
+    __table_args__ = (
+        Index("ix_seat_alert_active", "user_id", "crn", "is_active"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<SeatAlert(user={self.user_id}, crn={self.crn}, active={self.is_active})>"
+
+
+class SeatHistory(Base):
+    """
+    Historical seat availability data for analytics.
+
+    Records seat counts over time to enable:
+    - Fill rate analysis
+    - Popular course identification
+    - Registration pattern insights
+    - Trend visualization
+    """
+    __tablename__ = "seat_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    section_id: Mapped[int] = mapped_column(ForeignKey("sections.id"), index=True)
+    crn: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+
+    # Snapshot data
+    seats_available: Mapped[int] = mapped_column(Integer, nullable=False)
+    class_size: Mapped[int] = mapped_column(Integer, nullable=False)
+    waitlist_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Computed metrics
+    fill_rate: Mapped[Optional[float]] = mapped_column(Float)  # (class_size - seats_available) / class_size
+
+    # Timestamp
+    recorded_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, index=True
+    )
+
+    # Relationships
+    section: Mapped["Section"] = relationship("Section")
+
+    __table_args__ = (
+        Index("ix_seat_history_crn_time", "crn", "recorded_at"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<SeatHistory(crn={self.crn}, seats={self.seats_available}, time={self.recorded_at})>"
+
+
+# =============================================================================
 # Database Engine and Session Management
 # =============================================================================
 

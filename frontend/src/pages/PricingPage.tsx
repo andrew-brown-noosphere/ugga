@@ -95,11 +95,11 @@ export default function PricingPage() {
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">
-          Unlock Your Academic Potential
+          Graduate On Time, Stress-Free
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Get AI-powered course recommendations, personalized degree planning, and tools
-          to help you graduate smarter and faster.
+          AI-powered course planning that keeps students on track. Perfect for students
+          who want to optimize their path, or parents who want peace of mind.
         </p>
       </div>
 
@@ -229,6 +229,15 @@ export default function PricingPage() {
         </h3>
         <div className="space-y-4 text-left">
           <div className="card">
+            <h4 className="font-medium text-gray-900">What's free vs. premium?</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              <strong>Free for everyone:</strong> Browse courses, view syllabi, explore degree requirements,
+              join study groups, and coordinate with cohorts. <br />
+              <strong>Premium:</strong> AI-powered recommendations, smart schedule optimization,
+              course availability alerts, and priority support.
+            </p>
+          </div>
+          <div className="card">
             <h4 className="font-medium text-gray-900">Can I cancel anytime?</h4>
             <p className="text-sm text-gray-600 mt-1">
               Yes! You can cancel your subscription at any time. You'll continue to have access
@@ -243,10 +252,11 @@ export default function PricingPage() {
             </p>
           </div>
           <div className="card">
-            <h4 className="font-medium text-gray-900">Is there a free trial?</h4>
+            <h4 className="font-medium text-gray-900">I'm a parent. Can I help my student?</h4>
             <p className="text-sm text-gray-600 mt-1">
-              You can view your degree plan for free. Premium features like AI recommendations,
-              schedule optimization, and alerts require a subscription.
+              Absolutely! Many parents gift premium subscriptions to help their students
+              stay on track for graduation. The "Till Graduation" plan is our most popular
+              gift option - one payment covers their entire college journey.
             </p>
           </div>
         </div>

@@ -45,6 +45,7 @@ from src.api.chat import router as chat_router
 from src.api.study_groups import router as study_groups_router
 from src.api.cohorts import router as cohorts_router
 from src.api.social import router as social_router
+from src.api.alerts import router as alerts_router
 
 
 # Service dependency
@@ -109,6 +110,7 @@ app.include_router(chat_router)
 app.include_router(study_groups_router)
 app.include_router(cohorts_router)
 app.include_router(social_router)
+app.include_router(alerts_router)
 
 
 # =============================================================================

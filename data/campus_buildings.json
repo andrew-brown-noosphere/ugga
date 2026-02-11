@@ -1,0 +1,2164 @@
+{
+  "Conner Hall": {
+    "name": "Conner Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0104",
+      "0202",
+      "0204",
+      "0210",
+      "0212",
+      "0307",
+      "0310",
+      "0311"
+    ],
+    "room_count": 8,
+    "total_sections": 134,
+    "courses_offered": 93
+  },
+  "Griffin Slc": {
+    "name": "Griffin Slc",
+    "campuses": [
+      "Athens",
+      "Griffin",
+      "Tifton"
+    ],
+    "rooms": [
+      "0102",
+      "0107",
+      "0111",
+      "0116",
+      "0204",
+      "0205F",
+      "0210",
+      "0215",
+      "0216",
+      "0217",
+      "0218",
+      "TBA"
+    ],
+    "room_count": 12,
+    "total_sections": 135,
+    "courses_offered": 117
+  },
+  "H. H. Tift Bldg": {
+    "name": "H. H. Tift Bldg",
+    "campuses": [
+      "Tifton"
+    ],
+    "rooms": [
+      "0102",
+      "TBA"
+    ],
+    "room_count": 2,
+    "total_sections": 17,
+    "courses_offered": 15
+  },
+  "TBA": {
+    "name": "TBA",
+    "campuses": [
+      "Online",
+      "Griffin",
+      "Skidaway Inst of Oceanography",
+      "Study Abroad Cortona, Italy",
+      "Study Abroad Oxford, UK",
+      "Buckhead",
+      "Athens",
+      "Beijing Univ of Chem Tech",
+      "Field Study",
+      "Augusta",
+      "Gwinnett",
+      "Off Campus Site",
+      "Study Abroad General",
+      "Tifton"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 23703,
+    "courses_offered": 5252
+  },
+  "NESPAL South": {
+    "name": "NESPAL South",
+    "campuses": [
+      "Tifton"
+    ],
+    "rooms": [
+      "0533",
+      "0534"
+    ],
+    "room_count": 2,
+    "total_sections": 26,
+    "courses_offered": 26
+  },
+  "No Classroom Required": {
+    "name": "No Classroom Required",
+    "campuses": [
+      "Online",
+      "Griffin",
+      "Skidaway Inst of Oceanography",
+      "Study Abroad Cortona, Italy",
+      "Study Abroad Oxford, UK",
+      "Buckhead",
+      "Athens",
+      "Beijing Univ of Chem Tech",
+      "Field Study",
+      "Augusta",
+      "Gwinnett",
+      "Off Campus Site",
+      "Study Abroad General",
+      "Tifton"
+    ],
+    "rooms": [
+      "NCRR",
+      "TBA"
+    ],
+    "room_count": 2,
+    "total_sections": 13569,
+    "courses_offered": 2712
+  },
+  "Nespal": {
+    "name": "Nespal",
+    "campuses": [
+      "Tifton"
+    ],
+    "rooms": [
+      "0125",
+      "0201",
+      "0601"
+    ],
+    "room_count": 3,
+    "total_sections": 59,
+    "courses_offered": 55
+  },
+  "Cedar Street Building C": {
+    "name": "Cedar Street Building C",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0270",
+      "0271",
+      "0287",
+      "0378",
+      "0387",
+      "0400",
+      "0415",
+      "0417",
+      "0430",
+      "0474",
+      "0571",
+      "0574",
+      "0583",
+      "0589",
+      "0673",
+      "0674",
+      "0677",
+      "0678",
+      "0681",
+      "0685",
+      "0689",
+      "TBA"
+    ],
+    "room_count": 22,
+    "total_sections": 342,
+    "courses_offered": 148
+  },
+  "Zell B Miller Learning Center": {
+    "name": "Zell B Miller Learning Center",
+    "campuses": [
+      "Athens",
+      "Griffin"
+    ],
+    "rooms": [
+      "0101",
+      "0102",
+      "0147",
+      "0148",
+      "0150",
+      "0153",
+      "0171",
+      "0205",
+      "0207",
+      "0213",
+      "0214",
+      "0245",
+      "0247",
+      "0248",
+      "0250",
+      "0251",
+      "0253",
+      "0267",
+      "0268",
+      "0269",
+      "0274",
+      "0275",
+      "0277",
+      "0348",
+      "0350",
+      "0367"
+    ],
+    "room_count": 26,
+    "total_sections": 557,
+    "courses_offered": 290
+  },
+  "Sanford Hall": {
+    "name": "Sanford Hall",
+    "campuses": [
+      "Athens",
+      "Online"
+    ],
+    "rooms": [
+      "0105",
+      "0109",
+      "0112",
+      "0204",
+      "0207",
+      "0209",
+      "0212",
+      "0213",
+      "0309",
+      "0312",
+      "0313",
+      "0314"
+    ],
+    "room_count": 12,
+    "total_sections": 241,
+    "courses_offered": 120
+  },
+  "Inst Plaza": {
+    "name": "Inst Plaza",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "N106",
+      "S306"
+    ],
+    "room_count": 2,
+    "total_sections": 108,
+    "courses_offered": 23
+  },
+  "Correll Hall": {
+    "name": "Correll Hall",
+    "campuses": [
+      "Athens",
+      "Study Abroad General"
+    ],
+    "rooms": [
+      "0113",
+      "0116",
+      "0120",
+      "0124",
+      "0133",
+      "0213",
+      "0214",
+      "0218",
+      "0221",
+      "0222",
+      "0313",
+      "0315",
+      "0321"
+    ],
+    "room_count": 13,
+    "total_sections": 319,
+    "courses_offered": 163
+  },
+  "BLC II Benson Hall": {
+    "name": "BLC II Benson Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "C006",
+      "C010",
+      "C014",
+      "C101",
+      "C109",
+      "C115",
+      "C400"
+    ],
+    "room_count": 7,
+    "total_sections": 151,
+    "courses_offered": 94
+  },
+  "Amos Hall": {
+    "name": "Amos Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "B002",
+      "B010",
+      "B012",
+      "B112"
+    ],
+    "room_count": 4,
+    "total_sections": 86,
+    "courses_offered": 38
+  },
+  "Ivester": {
+    "name": "Ivester",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "E001",
+      "E007",
+      "E101",
+      "E107"
+    ],
+    "room_count": 4,
+    "total_sections": 114,
+    "courses_offered": 49
+  },
+  "Orkin": {
+    "name": "Orkin",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "D001",
+      "D007",
+      "D101",
+      "D107"
+    ],
+    "room_count": 4,
+    "total_sections": 108,
+    "courses_offered": 47
+  },
+  "Journalism": {
+    "name": "Journalism",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0118",
+      "0120",
+      "0130",
+      "0132",
+      "0203",
+      "0204",
+      "0239A",
+      "0241",
+      "0242",
+      "0243",
+      "0311",
+      "0401",
+      "0402",
+      "0409",
+      "0412",
+      "0501",
+      "0502",
+      "0505",
+      "0508",
+      "0509",
+      "0510",
+      "0511",
+      "0512",
+      "0513",
+      "0514",
+      "0515",
+      "0516",
+      "TBA"
+    ],
+    "room_count": 28,
+    "total_sections": 511,
+    "courses_offered": 225
+  },
+  "Peabody Hall": {
+    "name": "Peabody Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0105",
+      "0115",
+      "0201",
+      "0205C",
+      "0205S",
+      "0219",
+      "0219A",
+      "0220"
+    ],
+    "room_count": 8,
+    "total_sections": 197,
+    "courses_offered": 119
+  },
+  "Leconte Hall": {
+    "name": "Leconte Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0102",
+      "0135",
+      "0221",
+      "0230",
+      "0320",
+      "0321",
+      "0322",
+      "0323",
+      "0341"
+    ],
+    "room_count": 10,
+    "total_sections": 241,
+    "courses_offered": 165
+  },
+  "Fine Arts": {
+    "name": "Fine Arts",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0053",
+      "0056",
+      "0115",
+      "0201",
+      "0205",
+      "0255",
+      "0303",
+      "0310",
+      "0350",
+      "0352",
+      "0400"
+    ],
+    "room_count": 11,
+    "total_sections": 215,
+    "courses_offered": 135
+  },
+  "Rhodes Cntr Ads -B": {
+    "name": "Rhodes Cntr Ads -B",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0112",
+      "0114",
+      "0116",
+      "0118"
+    ],
+    "room_count": 5,
+    "total_sections": 79,
+    "courses_offered": 61
+  },
+  "Livest Ins Arena": {
+    "name": "Livest Ins Arena",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0109"
+    ],
+    "room_count": 1,
+    "total_sections": 5,
+    "courses_offered": 4
+  },
+  "Rhodes Cntr Ads -C": {
+    "name": "Rhodes Cntr Ads -C",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0104"
+    ],
+    "room_count": 1,
+    "total_sections": 4,
+    "courses_offered": 4
+  },
+  "Poultry Science Bldg.": {
+    "name": "Poultry Science Bldg.",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0007",
+      "0011",
+      "0014",
+      "0115",
+      "0125"
+    ],
+    "room_count": 5,
+    "total_sections": 110,
+    "courses_offered": 84
+  },
+  "Animal Dairy Sci -": {
+    "name": "Animal Dairy Sci -",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0145"
+    ],
+    "room_count": 1,
+    "total_sections": 12,
+    "courses_offered": 9
+  },
+  "Science Learning Center": {
+    "name": "Science Learning Center",
+    "campuses": [
+      "Athens",
+      "Field Study"
+    ],
+    "rooms": [
+      "0085",
+      "0101",
+      "0102",
+      "0105",
+      "0106",
+      "0116",
+      "0121",
+      "0122",
+      "0125",
+      "0145",
+      "0201",
+      "0202",
+      "0205",
+      "0206",
+      "0211",
+      "0212",
+      "0215",
+      "0221",
+      "0222",
+      "0225",
+      "0245",
+      "0251",
+      "0255",
+      "0285",
+      "0301",
+      "0302",
+      "0305",
+      "0306",
+      "0311",
+      "0312",
+      "0315",
+      "0321",
+      "0322",
+      "0325",
+      "0345",
+      "0351",
+      "0355"
+    ],
+    "room_count": 37,
+    "total_sections": 506,
+    "courses_offered": 68
+  },
+  "Driftmier Eng Ctr": {
+    "name": "Driftmier Eng Ctr",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "1215",
+      "1218",
+      "1290",
+      "1301",
+      "1304",
+      "1310",
+      "1311",
+      "1314",
+      "1350",
+      "1355",
+      "1361",
+      "1367",
+      "1401",
+      "1405",
+      "1409",
+      "1450",
+      "1453",
+      "1456",
+      "1460",
+      "TBA"
+    ],
+    "room_count": 20,
+    "total_sections": 459,
+    "courses_offered": 198
+  },
+  "Ecology": {
+    "name": "Ecology",
+    "campuses": [
+      "Athens",
+      "Field Study"
+    ],
+    "rooms": [
+      "0012",
+      "0029",
+      "0117",
+      "0201"
+    ],
+    "room_count": 4,
+    "total_sections": 111,
+    "courses_offered": 76
+  },
+  "Aderhold Hall": {
+    "name": "Aderhold Hall",
+    "campuses": [
+      "Athens",
+      "Griffin",
+      "Online",
+      "Augusta"
+    ],
+    "rooms": [
+      "00G5",
+      "0102",
+      "0112",
+      "0116",
+      "0119",
+      "0201",
+      "0215",
+      "0220",
+      "0223",
+      "0227",
+      "0228",
+      "0229",
+      "0306",
+      "0317",
+      "0319",
+      "0401",
+      "0411",
+      "0412",
+      "0417",
+      "0418",
+      "0422A",
+      "0430",
+      "0520",
+      "0531",
+      "0581",
+      "0601",
+      "0607",
+      "0616",
+      "0618",
+      "0625",
+      "0626",
+      "0627",
+      "0631",
+      "TBA"
+    ],
+    "room_count": 34,
+    "total_sections": 794,
+    "courses_offered": 432
+  },
+  "Life Sci F.Davison": {
+    "name": "Life Sci F.Davison",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "B116A",
+      "B118",
+      "B121",
+      "C104",
+      "C112",
+      "C114",
+      "C120",
+      "C122",
+      "C127",
+      "C128",
+      "C130"
+    ],
+    "room_count": 11,
+    "total_sections": 197,
+    "courses_offered": 109
+  },
+  "Cedar Street Building B": {
+    "name": "Cedar Street Building B",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0404A",
+      "0404B",
+      "0404D",
+      "0404E"
+    ],
+    "room_count": 4,
+    "total_sections": 123,
+    "courses_offered": 64
+  },
+  "Miller Plant Sci": {
+    "name": "Miller Plant Sci",
+    "campuses": [
+      "Athens",
+      "Griffin"
+    ],
+    "rooms": [
+      "1102",
+      "1113",
+      "1201",
+      "1203",
+      "1205",
+      "1501",
+      "1503",
+      "1503A",
+      "1604",
+      "2102",
+      "2104",
+      "2108",
+      "2201",
+      "2401",
+      "2507",
+      "2604",
+      "3113",
+      "3203",
+      "3406"
+    ],
+    "room_count": 19,
+    "total_sections": 337,
+    "courses_offered": 242
+  },
+  "Psychology": {
+    "name": "Psychology",
+    "campuses": [
+      "Athens",
+      "Online"
+    ],
+    "rooms": [
+      "0102",
+      "0111",
+      "0120",
+      "0164",
+      "0243",
+      "0304",
+      "0309",
+      "0418",
+      "0426",
+      "0507A",
+      "0513",
+      "0628"
+    ],
+    "room_count": 12,
+    "total_sections": 172,
+    "courses_offered": 68
+  },
+  "Holmes/Hunter Acad": {
+    "name": "Holmes/Hunter Acad",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0207"
+    ],
+    "room_count": 1,
+    "total_sections": 12,
+    "courses_offered": 11
+  },
+  "Park Hall": {
+    "name": "Park Hall",
+    "campuses": [
+      "Athens",
+      "Online"
+    ],
+    "rooms": [
+      "0060",
+      "0061",
+      "0064",
+      "0065",
+      "0067",
+      "0074",
+      "0079",
+      "0080",
+      "0081",
+      "0110",
+      "0113",
+      "0114",
+      "0115",
+      "0116",
+      "0121",
+      "0122",
+      "0126",
+      "0136",
+      "0139",
+      "0144",
+      "0145",
+      "0149",
+      "0225",
+      "0228",
+      "0250",
+      "0251",
+      "0259",
+      "0265",
+      "0269",
+      "0327"
+    ],
+    "room_count": 30,
+    "total_sections": 624,
+    "courses_offered": 259
+  },
+  "Baldwin Hall": {
+    "name": "Baldwin Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101B",
+      "0101D",
+      "0102",
+      "0104",
+      "0114A",
+      "0202",
+      "0264",
+      "0301",
+      "0302",
+      "0307",
+      "0311",
+      "0322",
+      "0326",
+      "0G32",
+      "0G41"
+    ],
+    "room_count": 15,
+    "total_sections": 352,
+    "courses_offered": 227
+  },
+  "Music Building": {
+    "name": "Music Building",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0103",
+      "0116",
+      "0200",
+      "0210",
+      "0212A",
+      "0212C",
+      "0228",
+      "0264",
+      "0304",
+      "0308",
+      "0355",
+      "0361",
+      "0408",
+      "0410",
+      "0412",
+      "0461",
+      "0504",
+      "0508",
+      "0521"
+    ],
+    "room_count": 19,
+    "total_sections": 492,
+    "courses_offered": 229
+  },
+  "Caldwell Hall": {
+    "name": "Caldwell Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0102",
+      "0105",
+      "0107",
+      "0202",
+      "0203",
+      "0204",
+      "0206",
+      "0302",
+      "0304",
+      "0305",
+      "0306",
+      "0502",
+      "0606",
+      "0607",
+      "0G10",
+      "0G11"
+    ],
+    "room_count": 16,
+    "total_sections": 362,
+    "courses_offered": 170
+  },
+  "Barrow Hall": {
+    "name": "Barrow Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0203",
+      "0205",
+      "0208",
+      "0215",
+      "0216"
+    ],
+    "room_count": 5,
+    "total_sections": 53,
+    "courses_offered": 41
+  },
+  "Joe Brown": {
+    "name": "Joe Brown",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0007",
+      "0011",
+      "0113",
+      "0117",
+      "0153",
+      "0154",
+      "0213",
+      "0217",
+      "0220",
+      "0241",
+      "0242",
+      "0247"
+    ],
+    "room_count": 12,
+    "total_sections": 190,
+    "courses_offered": 98
+  },
+  "Main Art Building": {
+    "name": "Main Art Building",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "N100",
+      "N104",
+      "N110",
+      "N115",
+      "N120",
+      "N125",
+      "N130",
+      "N140",
+      "N200",
+      "N207",
+      "N211",
+      "N215",
+      "N225",
+      "N240",
+      "N311",
+      "N315",
+      "N320",
+      "S150",
+      "S151",
+      "S160",
+      "S165",
+      "S170",
+      "S174",
+      "S175",
+      "S185",
+      "S250",
+      "S255",
+      "S258",
+      "S265",
+      "S279",
+      "S280",
+      "S285",
+      "S285M",
+      "S350",
+      "S365",
+      "S370",
+      "S376",
+      "S380"
+    ],
+    "room_count": 38,
+    "total_sections": 349,
+    "courses_offered": 155
+  },
+  "Four Towers": {
+    "name": "Four Towers",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0102",
+      "0204",
+      "0213"
+    ],
+    "room_count": 3,
+    "total_sections": 27,
+    "courses_offered": 27
+  },
+  "South Milledge Gh1": {
+    "name": "South Milledge Gh1",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0108"
+    ],
+    "room_count": 1,
+    "total_sections": 25,
+    "courses_offered": 24
+  },
+  "Hardman Hall": {
+    "name": "Hardman Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0102",
+      "0106",
+      "0107"
+    ],
+    "room_count": 4,
+    "total_sections": 61,
+    "courses_offered": 46
+  },
+  "Food Science": {
+    "name": "Food Science",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0131",
+      "0202",
+      "0215",
+      "0217",
+      "0218"
+    ],
+    "room_count": 5,
+    "total_sections": 105,
+    "courses_offered": 79
+  },
+  "Old College": {
+    "name": "Old College",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0100"
+    ],
+    "room_count": 1,
+    "total_sections": 22,
+    "courses_offered": 12
+  },
+  "Broad St Studio 3": {
+    "name": "Broad St Studio 3",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "TBA"
+    ],
+    "room_count": 2,
+    "total_sections": 3,
+    "courses_offered": 2
+  },
+  "Broad St Studio 2": {
+    "name": "Broad St Studio 2",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0114",
+      "0116",
+      "0118"
+    ],
+    "room_count": 3,
+    "total_sections": 12,
+    "courses_offered": 7
+  },
+  "Thomas St Sculp": {
+    "name": "Thomas St Sculp",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0108",
+      "0202",
+      "0205"
+    ],
+    "room_count": 3,
+    "total_sections": 35,
+    "courses_offered": 15
+  },
+  "Ceramics": {
+    "name": "Ceramics",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0109"
+    ],
+    "room_count": 2,
+    "total_sections": 19,
+    "courses_offered": 6
+  },
+  "Jewelry&Metalwork": {
+    "name": "Jewelry&Metalwork",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101"
+    ],
+    "room_count": 1,
+    "total_sections": 15,
+    "courses_offered": 6
+  },
+  "Thomas St., South": {
+    "name": "Thomas St., South",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0121"
+    ],
+    "room_count": 1,
+    "total_sections": 7,
+    "courses_offered": 5
+  },
+  "Forest Resources-4": {
+    "name": "Forest Resources-4",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0213",
+      "0418",
+      "0419",
+      "0516",
+      "0517"
+    ],
+    "room_count": 5,
+    "total_sections": 139,
+    "courses_offered": 107
+  },
+  "Forest Resources-1": {
+    "name": "Forest Resources-1",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0107",
+      "0201",
+      "0209",
+      "0210",
+      "0303",
+      "0304",
+      "0306",
+      "0307"
+    ],
+    "room_count": 9,
+    "total_sections": 222,
+    "courses_offered": 168
+  },
+  "Boyd Research & Education CTR": {
+    "name": "Boyd Research & Education CTR",
+    "campuses": [
+      "Athens",
+      "Augusta"
+    ],
+    "rooms": [
+      "0201",
+      "0202",
+      "0203",
+      "0204",
+      "0208",
+      "0220",
+      "0221",
+      "0222",
+      "0302",
+      "0303",
+      "0304",
+      "0306",
+      "0307A",
+      "0322",
+      "0323",
+      "0326",
+      "0328",
+      "0410",
+      "0628"
+    ],
+    "room_count": 19,
+    "total_sections": 497,
+    "courses_offered": 149
+  },
+  "Physics": {
+    "name": "Physics",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0202",
+      "0204B",
+      "0221",
+      "0250",
+      "0254",
+      "0303",
+      "0314",
+      "0319",
+      "0322",
+      "0327"
+    ],
+    "room_count": 10,
+    "total_sections": 175,
+    "courses_offered": 90
+  },
+  "Geography Geology": {
+    "name": "Geography Geology",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0141",
+      "0142",
+      "0143",
+      "0144",
+      "0147",
+      "0153",
+      "0154",
+      "0155",
+      "0200A",
+      "0200B",
+      "0200C",
+      "0200D",
+      "0216",
+      "0218",
+      "0300A",
+      "0311",
+      "0321",
+      "0325",
+      "0327",
+      "0B27"
+    ],
+    "room_count": 20,
+    "total_sections": 386,
+    "courses_offered": 241
+  },
+  "Ramsey Stu Ctr Pa": {
+    "name": "Ramsey Stu Ctr Pa",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0103",
+      "0109",
+      "0110",
+      "0114",
+      "0115E",
+      "0116",
+      "0133",
+      "0156",
+      "0157",
+      "0202",
+      "0203",
+      "0205",
+      "0213",
+      "0214",
+      "0215",
+      "0224",
+      "0225",
+      "0230",
+      "0233",
+      "0238",
+      "0383",
+      "0388",
+      "0389"
+    ],
+    "room_count": 23,
+    "total_sections": 422,
+    "courses_offered": 147
+  },
+  "I-STEM 2": {
+    "name": "I-STEM 2",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "1218",
+      "1251",
+      "2205",
+      "3205"
+    ],
+    "room_count": 4,
+    "total_sections": 61,
+    "courses_offered": 41
+  },
+  "Coverdell Center": {
+    "name": "Coverdell Center",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0104",
+      "0175",
+      "0339"
+    ],
+    "room_count": 3,
+    "total_sections": 35,
+    "courses_offered": 33
+  },
+  "I-STEM 1": {
+    "name": "I-STEM 1",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "1023",
+      "2043",
+      "3043"
+    ],
+    "room_count": 3,
+    "total_sections": 32,
+    "courses_offered": 14
+  },
+  "Forest Resources-2": {
+    "name": "Forest Resources-2",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0100"
+    ],
+    "room_count": 1,
+    "total_sections": 28,
+    "courses_offered": 16
+  },
+  "Russell Hall Hsc": {
+    "name": "Russell Hall Hsc",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0203",
+      "0205",
+      "0217"
+    ],
+    "room_count": 3,
+    "total_sections": 25,
+    "courses_offered": 25
+  },
+  "Wright Hall": {
+    "name": "Wright Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0102C",
+      "0120A",
+      "0133",
+      "0150"
+    ],
+    "room_count": 4,
+    "total_sections": 40,
+    "courses_offered": 36
+  },
+  "Miller Hall": {
+    "name": "Miller Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0133",
+      "0201"
+    ],
+    "room_count": 2,
+    "total_sections": 2,
+    "courses_offered": 2
+  },
+  "Vet Med - 1": {
+    "name": "Vet Med - 1",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "1044",
+      "1050",
+      "2056",
+      "2501",
+      "2515",
+      "3012",
+      "TBA"
+    ],
+    "room_count": 7,
+    "total_sections": 94,
+    "courses_offered": 55
+  },
+  "Jackson St Bldg": {
+    "name": "Jackson St Bldg",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0026",
+      "0028",
+      "0112",
+      "0123",
+      "0125",
+      "0126",
+      "0128",
+      "0130",
+      "0131",
+      "0132"
+    ],
+    "room_count": 10,
+    "total_sections": 146,
+    "courses_offered": 71
+  },
+  "Moore-Rooker Hall": {
+    "name": "Moore-Rooker Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "A009",
+      "A015"
+    ],
+    "room_count": 2,
+    "total_sections": 25,
+    "courses_offered": 15
+  },
+  "Broad St Studio 1": {
+    "name": "Broad St Studio 1",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101"
+    ],
+    "room_count": 1,
+    "total_sections": 3,
+    "courses_offered": 3
+  },
+  "School of Social Work Building": {
+    "name": "School of Social Work Building",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0104",
+      "0211",
+      "0213",
+      "0215",
+      "0221",
+      "0241",
+      "0245",
+      "0G12",
+      "0G16"
+    ],
+    "room_count": 9,
+    "total_sections": 163,
+    "courses_offered": 57
+  },
+  "Dawson Hall": {
+    "name": "Dawson Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0110",
+      "0116",
+      "0164",
+      "0166",
+      "0202",
+      "0205",
+      "0206",
+      "0208",
+      "0264",
+      "0306",
+      "0308",
+      "0310",
+      "0312",
+      "0379"
+    ],
+    "room_count": 15,
+    "total_sections": 305,
+    "courses_offered": 235
+  },
+  "Cedar Street Building D": {
+    "name": "Cedar Street Building D",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0401"
+    ],
+    "room_count": 1,
+    "total_sections": 3,
+    "courses_offered": 2
+  },
+  "Robt C Wilson Phar": {
+    "name": "Robt C Wilson Phar",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0120",
+      "0232",
+      "0238",
+      "0337",
+      "0338",
+      "0362",
+      "0408",
+      "TBA"
+    ],
+    "room_count": 8,
+    "total_sections": 169,
+    "courses_offered": 64
+  },
+  "Gilbert Hall": {
+    "name": "Gilbert Hall",
+    "campuses": [
+      "Athens",
+      "Study Abroad General"
+    ],
+    "rooms": [
+      "0035",
+      "0112",
+      "0113",
+      "0115",
+      "0116",
+      "0118",
+      "0230",
+      "0251",
+      "0303",
+      "0309",
+      "0320",
+      "0350K",
+      "0360"
+    ],
+    "room_count": 13,
+    "total_sections": 257,
+    "courses_offered": 122
+  },
+  "New College": {
+    "name": "New College",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0118"
+    ],
+    "room_count": 1,
+    "total_sections": 21,
+    "courses_offered": 16
+  },
+  "Brooks Hall": {
+    "name": "Brooks Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0145",
+      "0520"
+    ],
+    "room_count": 2,
+    "total_sections": 90,
+    "courses_offered": 25
+  },
+  "Tanner Building": {
+    "name": "Tanner Building",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0102",
+      "0301",
+      "0305",
+      "0306",
+      "0307"
+    ],
+    "room_count": 5,
+    "total_sections": 29,
+    "courses_offered": 28
+  },
+  "Denmark Hall": {
+    "name": "Denmark Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0104",
+      "0110",
+      "0201"
+    ],
+    "room_count": 3,
+    "total_sections": 39,
+    "courses_offered": 36
+  },
+  "Horticulture Bldg": {
+    "name": "Horticulture Bldg",
+    "campuses": [
+      "Tifton"
+    ],
+    "rooms": [
+      "0102"
+    ],
+    "room_count": 1,
+    "total_sections": 22,
+    "courses_offered": 22
+  },
+  "Stat/Computer Srvs": {
+    "name": "Stat/Computer Srvs",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0008",
+      "0306",
+      "0307"
+    ],
+    "room_count": 3,
+    "total_sections": 29,
+    "courses_offered": 18
+  },
+  "C A G T": {
+    "name": "C A G T",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0128"
+    ],
+    "room_count": 1,
+    "total_sections": 11,
+    "courses_offered": 9
+  },
+  "Enviro Health Sci": {
+    "name": "Enviro Health Sci",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0120",
+      "0207"
+    ],
+    "room_count": 3,
+    "total_sections": 28,
+    "courses_offered": 20
+  },
+  "Marine Sci - Dance": {
+    "name": "Marine Sci - Dance",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0139",
+      "0208",
+      "0239",
+      "0261",
+      "0267",
+      "0272",
+      "0274",
+      "0276",
+      "0304"
+    ],
+    "room_count": 9,
+    "total_sections": 102,
+    "courses_offered": 75
+  },
+  "Strength Lab": {
+    "name": "Strength Lab",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0100"
+    ],
+    "room_count": 1,
+    "total_sections": 10,
+    "courses_offered": 3
+  },
+  "105 Bowstrom Rd": {
+    "name": "105 Bowstrom Rd",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0108"
+    ],
+    "room_count": 1,
+    "total_sections": 6,
+    "courses_offered": 6
+  },
+  "Uga Gwinnett": {
+    "name": "Uga Gwinnett",
+    "campuses": [
+      "Gwinnett"
+    ],
+    "rooms": [
+      "0107",
+      "0109",
+      "0110",
+      "0113",
+      "0114",
+      "0118",
+      "0119",
+      "0121",
+      "0122",
+      "0123",
+      "0124",
+      "0134",
+      "0135",
+      "0140",
+      "0141",
+      "0143",
+      "0147",
+      "TBA"
+    ],
+    "room_count": 18,
+    "total_sections": 187,
+    "courses_offered": 53
+  },
+  "Law School": {
+    "name": "Law School",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0120",
+      "0122",
+      "0246",
+      "0252",
+      "0254",
+      "0256",
+      "0328",
+      "0343",
+      "0347",
+      "0353",
+      "0355",
+      "0358",
+      "0366"
+    ],
+    "room_count": 13,
+    "total_sections": 154,
+    "courses_offered": 119
+  },
+  "Meigs Hall": {
+    "name": "Meigs Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0218"
+    ],
+    "room_count": 2,
+    "total_sections": 19,
+    "courses_offered": 16
+  },
+  "River'S Crossing": {
+    "name": "River'S Crossing",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0113",
+      "0135",
+      "0136",
+      "0139",
+      "0143",
+      "0156"
+    ],
+    "room_count": 6,
+    "total_sections": 39,
+    "courses_offered": 32
+  },
+  "Military,Army Rotc": {
+    "name": "Military,Army Rotc",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0001",
+      "0002",
+      "0004",
+      "0021"
+    ],
+    "room_count": 4,
+    "total_sections": 55,
+    "courses_offered": 33
+  },
+  "Athena Studios": {
+    "name": "Athena Studios",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0106"
+    ],
+    "room_count": 1,
+    "total_sections": 9,
+    "courses_offered": 8
+  },
+  "Pharmacy South": {
+    "name": "Pharmacy South",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101",
+      "0201",
+      "0220",
+      "0230",
+      "0301"
+    ],
+    "room_count": 5,
+    "total_sections": 174,
+    "courses_offered": 59
+  },
+  "Candler Hall": {
+    "name": "Candler Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0115",
+      "0117",
+      "0214"
+    ],
+    "room_count": 3,
+    "total_sections": 31,
+    "courses_offered": 23
+  },
+  "Schwab Financial Planning Cntr": {
+    "name": "Schwab Financial Planning Cntr",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101"
+    ],
+    "room_count": 1,
+    "total_sections": 16,
+    "courses_offered": 4
+  },
+  "Child Devel. Lab": {
+    "name": "Child Devel. Lab",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0309"
+    ],
+    "room_count": 1,
+    "total_sections": 6,
+    "courses_offered": 4
+  },
+  "Family Sci Ctr I": {
+    "name": "Family Sci Ctr I",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0103"
+    ],
+    "room_count": 1,
+    "total_sections": 4,
+    "courses_offered": 4
+  },
+  "A B E L": {
+    "name": "A B E L",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0124"
+    ],
+    "room_count": 1,
+    "total_sections": 6,
+    "courses_offered": 6
+  },
+  "Wildlife Health": {
+    "name": "Wildlife Health",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0101"
+    ],
+    "room_count": 1,
+    "total_sections": 1,
+    "courses_offered": 1
+  },
+  "Ga Mus Of Art Pvac": {
+    "name": "Ga Mus Of Art Pvac",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0120"
+    ],
+    "room_count": 1,
+    "total_sections": 3,
+    "courses_offered": 3
+  },
+  "Georgia Center C.E": {
+    "name": "Georgia Center C.E",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 3,
+    "courses_offered": 2
+  },
+  "Moore College": {
+    "name": "Moore College",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0102",
+      "0202",
+      "0302",
+      "0309"
+    ],
+    "room_count": 4,
+    "total_sections": 24,
+    "courses_offered": 7
+  },
+  "Cowart Building": {
+    "name": "Cowart Building",
+    "campuses": [
+      "Griffin"
+    ],
+    "rooms": [
+      "0214"
+    ],
+    "room_count": 1,
+    "total_sections": 1,
+    "courses_offered": 1
+  },
+  "Pound Hall": {
+    "name": "Pound Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0111"
+    ],
+    "room_count": 1,
+    "total_sections": 13,
+    "courses_offered": 13
+  },
+  "Bus. Service Annex": {
+    "name": "Bus. Service Annex",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 1,
+    "courses_offered": 1
+  },
+  "Italy, Verona": {
+    "name": "Italy, Verona",
+    "campuses": [
+      "Study Abroad General"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 4,
+    "courses_offered": 4
+  },
+  "Bank Of America": {
+    "name": "Bank Of America",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0601"
+    ],
+    "room_count": 1,
+    "total_sections": 8,
+    "courses_offered": 5
+  },
+  "Delta Hall": {
+    "name": "Delta Hall",
+    "campuses": [
+      "Field Study"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 2,
+    "courses_offered": 2
+  },
+  "Dean Rusk Hall": {
+    "name": "Dean Rusk Hall",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0109",
+      "0120",
+      "0203",
+      "0321"
+    ],
+    "room_count": 4,
+    "total_sections": 21,
+    "courses_offered": 17
+  },
+  "Skidaway Mar Ext": {
+    "name": "Skidaway Mar Ext",
+    "campuses": [
+      "Skidaway Inst of Oceanography",
+      "Field Study"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 64,
+    "courses_offered": 24
+  },
+  "Performng Arts Ctr": {
+    "name": "Performng Arts Ctr",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0140"
+    ],
+    "room_count": 1,
+    "total_sections": 46,
+    "courses_offered": 23
+  },
+  "Golf Driv Rng Bld": {
+    "name": "Golf Driv Rng Bld",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 21,
+    "courses_offered": 3
+  },
+  "Intramural Fields": {
+    "name": "Intramural Fields",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "T001",
+      "TBA"
+    ],
+    "room_count": 2,
+    "total_sections": 48,
+    "courses_offered": 6
+  },
+  "HM Pharmacy GRU": {
+    "name": "HM Pharmacy GRU",
+    "campuses": [
+      "Athens",
+      "Off Campus Site",
+      "Augusta"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 41,
+    "courses_offered": 10
+  },
+  "Ps Service Bldg A": {
+    "name": "Ps Service Bldg A",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0002"
+    ],
+    "room_count": 1,
+    "total_sections": 2,
+    "courses_offered": 1
+  },
+  "TURF SCI R&E FAC": {
+    "name": "TURF SCI R&E FAC",
+    "campuses": [
+      "Griffin"
+    ],
+    "rooms": [
+      "0202"
+    ],
+    "room_count": 1,
+    "total_sections": 4,
+    "courses_offered": 4
+  },
+  "Scotland, Edinbrgh": {
+    "name": "Scotland, Edinbrgh",
+    "campuses": [
+      "Study Abroad General"
+    ],
+    "rooms": [
+      "TBA"
+    ],
+    "room_count": 1,
+    "total_sections": 1,
+    "courses_offered": 1
+  },
+  "DLW Center": {
+    "name": "DLW Center",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0110",
+      "0113",
+      "0117",
+      "0121",
+      "0124"
+    ],
+    "room_count": 5,
+    "total_sections": 54,
+    "courses_offered": 18
+  },
+  "Cedar Street Building A": {
+    "name": "Cedar Street Building A",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0123",
+      "0125",
+      "0127",
+      "0131",
+      "0133",
+      "0135",
+      "0137",
+      "0140",
+      "0142",
+      "0144"
+    ],
+    "room_count": 10,
+    "total_sections": 66,
+    "courses_offered": 12
+  },
+  "Ecology Centers": {
+    "name": "Ecology Centers",
+    "campuses": [
+      "Athens"
+    ],
+    "rooms": [
+      "0111"
+    ],
+    "room_count": 1,
+    "total_sections": 5,
+    "courses_offered": 5
+  },
+  "Flynt Building": {
+    "name": "Flynt Building",
+    "campuses": [
+      "Griffin"
+    ],
+    "rooms": [
+      "0301"
+    ],
+    "room_count": 1,
+    "total_sections": 2,
+    "courses_offered": 2
+  }
+}
