@@ -3,11 +3,12 @@ AI Chat API Router.
 
 Provides conversational AI for academic advising using RAG.
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from typing import Optional
 
 from src.api.auth import get_current_user, get_optional_user
+from src.api.rate_limit import limiter
 from src.services.ai_chat_service import get_chat_service, ChatMessage, ChatResponse
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -36,8 +37,11 @@ class ChatMessageResponse(BaseModel):
 
 
 @router.post("", response_model=ChatMessageResponse)
+@limiter.limit("20/minute")
+@limiter.limit("100/hour")
 async def send_message(
-    request: ChatMessageRequest,
+    request: Request,
+    body: ChatMessageRequest,
     user: Optional[dict] = Depends(get_optional_user),
 ):
     """
@@ -45,16 +49,18 @@ async def send_message(
 
     The AI uses RAG to search courses, syllabi, and program data
     to provide grounded responses about UGA academics.
+
+    Rate limited to 20 requests/minute, 100 requests/hour per user.
     """
     try:
         chat_service = get_chat_service()
 
         # Convert history dict to ChatMessage objects
         history = None
-        if request.history:
+        if body.history:
             history = [
                 ChatMessage(role=msg["role"], content=msg["content"])
-                for msg in request.history
+                for msg in body.history
                 if "role" in msg and "content" in msg
             ]
 
@@ -62,7 +68,7 @@ async def send_message(
         user_id = user.get("id") if user else None
 
         response = chat_service.chat(
-            message=request.message,
+            message=body.message,
             history=history,
             user_id=user_id,
         )

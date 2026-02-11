@@ -15,7 +15,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import httpx
-from fastapi import FastAPI, HTTPException, Query, Depends, BackgroundTasks
+from fastapi import FastAPI, HTTPException, Query, Depends, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -46,6 +46,8 @@ from src.api.study_groups import router as study_groups_router
 from src.api.cohorts import router as cohorts_router
 from src.api.social import router as social_router
 from src.api.alerts import router as alerts_router
+from src.api.rate_limit import limiter, rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 
 # Service dependency
@@ -90,6 +92,10 @@ Built for smart schedule planning with future integrations planned for:
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # CORS middleware for frontend access
 app.add_middleware(
@@ -409,22 +415,24 @@ def get_embedding_service():
 
 
 @app.post("/search/semantic", response_model=SemanticSearchResponse, tags=["Search"])
-async def semantic_search(request: SemanticSearchRequest):
+@limiter.limit("30/minute")
+async def semantic_search(request: Request, body: SemanticSearchRequest):
     """
     Search courses using natural language semantic similarity.
 
     Requires OpenAI API key and PostgreSQL with pgvector.
+    Rate limited to 30 requests/minute.
     """
     try:
         embedding_service = get_embedding_service()
         results = embedding_service.search_courses_semantic(
-            query=request.query,
-            limit=request.limit,
-            threshold=request.threshold,
+            query=body.query,
+            limit=body.limit,
+            threshold=body.threshold,
         )
 
         return SemanticSearchResponse(
-            query=request.query,
+            query=body.query,
             results=[
                 SemanticCourseResult(
                     course_code=course.course_code,
@@ -446,18 +454,20 @@ async def semantic_search(request: SemanticSearchRequest):
 
 
 @app.post("/search/rag-context", response_model=RAGContextResponse, tags=["Search"])
-async def get_rag_context(request: RAGContextRequest):
+@limiter.limit("30/minute")
+async def get_rag_context(request: Request, body: RAGContextRequest):
     """
     Get context for RAG (Retrieval Augmented Generation).
 
     Returns relevant courses and documents for use in LLM prompts.
+    Rate limited to 30 requests/minute.
     """
     try:
         embedding_service = get_embedding_service()
         context = embedding_service.get_rag_context(
-            query=request.query,
-            max_courses=request.max_courses,
-            max_documents=request.max_documents,
+            query=body.query,
+            max_courses=body.max_courses,
+            max_documents=body.max_documents,
         )
 
         return RAGContextResponse(

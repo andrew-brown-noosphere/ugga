@@ -242,7 +242,7 @@ export default function PlanPage() {
   const navigate = useNavigate()
   const { isSignedIn, isLoaded, getToken } = useAuth()
   const { user } = useUser()
-  const { plan, clearPlan, hasPlan } = usePlan()
+  const { plan, clearPlan } = usePlan()
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['major']))
   const [viewMode, setViewMode] = useState<'requirements' | 'calendar'>('requirements')
   const [showCourseEntry, setShowCourseEntry] = useState(false)
