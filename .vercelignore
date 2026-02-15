@@ -1,3 +1,7 @@
+# Backend API (deployed to Railway, not Vercel)
+api/
+src/
+
 # Large data files not needed for API
 data/
 design/
