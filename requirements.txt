@@ -47,6 +47,13 @@ stripe>=7.0.0
 # Rate Limiting
 slowapi>=0.1.9
 
+# Background Tasks (Celery)
+celery>=5.3.0
+redis>=5.0.0
+
+# Email (Resend)
+resend>=0.8.0
+
 # Development/Testing
 pytest>=8.0.0
 pytest-asyncio>=0.23.0

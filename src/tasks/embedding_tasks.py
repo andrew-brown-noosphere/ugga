@@ -304,7 +304,7 @@ def check_seat_alerts_task(self) -> dict:
 
                         logger.info(
                             f"Triggered alert for {user.email}: "
-                            f"{section.course_code} has {section.seats_available} seats"
+                            f"{alert.course_code} has {section.seats_available} seats"
                         )
 
                 # Update last known seats
@@ -435,7 +435,7 @@ def _send_email_alert(user, alert, section):
         import resend
         resend.api_key = settings.resend_api_key
 
-        subject = f"Seats Available: {section.course_code}"
+        subject = f"Seats Available: {alert.course_code}"
 
         html_content = f"""
         <h2>Seats Available!</h2>
@@ -444,7 +444,7 @@ def _send_email_alert(user, alert, section):
         <table style="border-collapse: collapse; margin: 20px 0;">
             <tr>
                 <td style="padding: 8px; border: 1px solid #ddd;"><strong>Course:</strong></td>
-                <td style="padding: 8px; border: 1px solid #ddd;">{section.course_code}</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{alert.course_code}</td>
             </tr>
             <tr>
                 <td style="padding: 8px; border: 1px solid #ddd;"><strong>CRN:</strong></td>

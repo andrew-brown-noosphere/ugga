@@ -19,7 +19,7 @@ celery_app = Celery(
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
     include=[
-        "src.tasks.scanner_tasks",
+        # "src.tasks.scanner_tasks",  # TODO: Re-enable when schedule_scanner is implemented
         "src.tasks.embedding_tasks",
     ],
 )
@@ -43,11 +43,11 @@ celery_app.conf.update(
 
     # Beat scheduler (for periodic tasks)
     beat_schedule={
-        # Seat availability updates - every 15 minutes during business hours
-        "update-seat-availability": {
-            "task": "src.tasks.scanner_tasks.update_all_seat_availability",
-            "schedule": 900.0,  # Every 15 minutes
-        },
+        # TODO: Re-enable when schedule_scanner is implemented
+        # "update-seat-availability": {
+        #     "task": "src.tasks.scanner_tasks.update_all_seat_availability",
+        #     "schedule": 900.0,  # Every 15 minutes
+        # },
         # Check seat alerts - every 5 minutes for timely notifications
         "check-seat-alerts": {
             "task": "src.tasks.embedding_tasks.check_seat_alerts_task",
